@@ -1,0 +1,115 @@
+////////////////////////////////////////////////////////////////////////////////
+//
+// Code::Blocks new project wizard script
+//
+// Project: Sming Wizard
+// Author:  Brian Walton
+// Derived from works by:  Brian Sidebotham & H. Metin OZER
+//
+////////////////////////////////////////////////////////////////////////////////
+
+function BeginWizard()
+{
+    local wiz_type = Wizard.GetWizardType();
+
+    if (wiz_type == wizProject)
+    {
+        local intro_msg = _T("Welcome to the SMING project wizard!\n" +
+                             "This wizard will guide you through creating a new SMING project for the ESP8266.\n\n" +
+                             "When you 're ready to proceed, please click \"Next\"...");
+
+        Wizard.AddInfoPage(_T("SMINGIntro"), intro_msg);
+        Wizard.AddProjectPathPage();
+    }
+    else
+        print(wiz_type);
+}
+
+// -----------------------------------------------------------------------------
+// each time, return a string of the form "filename.ext;contents"
+// you can change the return string based on <file_index>
+// return an empty string to denote that no more files are to be generated
+function GetGeneratedFile(file_index)
+{
+	local path = _T("");
+	local filename = _T("");
+	local filecontent = _T("");
+	local result = _T("");
+    if (file_index < 5)
+    {
+		filename = GetTemplateFile(file_index);
+        path = Wizard.FindTemplateFile(_T("sming/files/" + filename));
+		filecontent = GenerateFile(path);
+        result = filename + _T(";") + filecontent;
+		//return (GetTemplateFile(file_index) + _T(";") + GenerateFile(Wizard.FindTemplateFile(_T("sming/files/" + GetTemplateFile(file_index))))); //This works but it is more difficult to debug
+    }
+    return result;
+}
+
+// -----------------------------------------------------------------------------
+// return the template's filename, appending <dot_ext> as an extension (must include the dot)
+function GetTemplateFile(index)
+{
+    if (index == 0)
+	{
+        return _T("Makefile");
+    }
+	else
+    if (index == 1)
+    {
+		return _T("Makefile-user.mk");
+    }
+    else
+    if (index == 2)
+    {
+		return _T("src/application.cpp");
+    }
+	else
+    if (index == 3)
+    {
+		return _T("include/application.h");
+    }
+	else
+    if (index == 4)
+    {
+		return _T("include/user_config.h");
+    }
+
+    return _T("");
+}
+
+function GetFilesDir()
+{
+    local result = _T("");
+    return result;
+}
+
+// -----------------------------------------------------------------------------
+// return the implementation contents string
+function GenerateFile(path)
+{
+    return IO.ReadFileContents(path);
+}
+
+// setup the already created project
+function SetupProject(project)
+{
+    // we don't need default targets
+    project.RemoveBuildTarget(_T("Debug"));
+    project.RemoveBuildTarget(_T("Release"));
+
+    // set compiler - we only use make from this compiler configuration
+//    project.SetCompilerID(_T("gcc"));
+    project.SetCompilerID(_T("xtensa-lx106-elf"));
+
+    // we use custom Makefile
+    project.SetMakefileCustom(true);
+
+    // we need customized targets, 'all' is the main target
+    project.AddBuildTarget(_T("all"));
+    project.AddBuildTarget(_T("flash"));
+    project.AddBuildTarget(_T("flashinit"));
+	project.SetActiveBuildTarget(_T("flash"));
+
+    return true;
+}
