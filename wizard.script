@@ -92,10 +92,15 @@ function SetupProject(project)
     project.RemoveBuildTarget(_T("Debug"));
     project.RemoveBuildTarget(_T("Release"));
     // Add targets
-    project.AddBuildTarget(_T("build"));
-    project.AddBuildTarget(_T("flash"));
-    project.AddBuildTarget(_T("flashinit"));
-    project.AddBuildTarget(_T("spiff_update"));
+	project.SetMakeCommandFor(mcClean, _T("$make -f $makefile clean"));
+    local buildTarget = project.AddBuildTarget(_T("build"));
+	buildTarget.SetMakeCommandFor(mcClean, _T("$make -f $makefile clean"));
+    buildTarget = project.AddBuildTarget(_T("flash"));
+	buildTarget.SetMakeCommandFor(mcClean, _T("$make -f $makefile clean"));
+    buildTarget = project.AddBuildTarget(_T("flashinit"));
+	buildTarget.SetMakeCommandFor(mcClean, _T("$make -f $makefile clean"));
+    buildTarget = project.AddBuildTarget(_T("spiff_update"));
+	buildTarget.SetMakeCommandFor(mcClean, _T("$make -f $makefile clean"));
 	
 	// Add code completion paths (not working!!!)
 	project.AddToExtensions(_T("code_completion/+search_path:add=include_path"));

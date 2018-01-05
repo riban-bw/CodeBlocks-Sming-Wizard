@@ -5,9 +5,9 @@ Wizard for Code::Blocks to create Sming ESP8266 project
 
 1. Enter the default wizard location, e.g.:
 
-    `cd ~/.local/share/codeblocks/templates/wizard/`
+    `cd /opt/codeblocks/share/codeblocks/templates/wizard`
 
-2. Clone the repository:
+2. Clone the repository to directory 'sming':
 
     `git clone https://github.com/riban-bw/codeblocks-sming-wizard sming`
 
