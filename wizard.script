@@ -26,28 +26,23 @@ function BeginWizard()
 }
 
 // -----------------------------------------------------------------------------
-// each time, return a string of the form "filename.ext;contents"
-// you can change the return string based on <file_index>
-// return an empty string to denote that no more files are to be generated
+// Return a string of the form "filename;contents"
+// Return an empty string to denote that no more files are to be generated
 function GetGeneratedFile(file_index)
 {
-	local path = _T("");
-	local filename = _T("");
-	local filecontent = _T("");
-	local result = _T("");
-    if (file_index < 5)
+	local filename = GetTemplateFile(file_index);
+    if (filename != _T(""))
     {
-		filename = GetTemplateFile(file_index);
-        path = Wizard.FindTemplateFile(_T("sming/files/" + filename));
-		filecontent = GenerateFile(path);
-        result = filename + _T(";") + filecontent;
-		//return (GetTemplateFile(file_index) + _T(";") + GenerateFile(Wizard.FindTemplateFile(_T("sming/files/" + GetTemplateFile(file_index))))); //This works but it is more difficult to debug
+        local path = Wizard.FindTemplateFile(_T("sming/files/" + filename));
+		local filecontent = IO.ReadFileContents(path);
+        return filename + _T(";") + filecontent;
     }
-    return result;
+	else
+		return _T("");
 }
 
 // -----------------------------------------------------------------------------
-// return the template's filename, appending <dot_ext> as an extension (must include the dot)
+// Return template filename based on an index
 function GetTemplateFile(index)
 {
     if (index == 0)
@@ -74,42 +69,36 @@ function GetTemplateFile(index)
     {
 		return _T("include/user_config.h");
     }
+	else
+    if (index == 5)
+    {
+		return _T("files/README.txt");
+    }
 
     return _T("");
 }
 
-function GetFilesDir()
-{
-    local result = _T("");
-    return result;
-}
 
-// -----------------------------------------------------------------------------
-// return the implementation contents string
-function GenerateFile(path)
-{
-    return IO.ReadFileContents(path);
-}
-
-// setup the already created project
+// Setup the the project
 function SetupProject(project)
 {
-    // we don't need default targets
-    project.RemoveBuildTarget(_T("Debug"));
-    project.RemoveBuildTarget(_T("Release"));
+    // Set compiler - we only use make from this compiler configuration
+    project.SetCompilerID(_T("cygwin"));
 
-    // set compiler - we only use make from this compiler configuration
-//    project.SetCompilerID(_T("gcc"));
-    project.SetCompilerID(_T("xtensa-lx106-elf"));
-
-    // we use custom Makefile
+    // We use custom Makefile
     project.SetMakefileCustom(true);
 
-    // we need customized targets, 'all' is the main target
-    project.AddBuildTarget(_T("all"));
+    // Remove default targets
+    project.RemoveBuildTarget(_T("Debug"));
+    project.RemoveBuildTarget(_T("Release"));
+    // Add targets
+    project.AddBuildTarget(_T("build"));
     project.AddBuildTarget(_T("flash"));
     project.AddBuildTarget(_T("flashinit"));
-	project.SetActiveBuildTarget(_T("flash"));
+    project.AddBuildTarget(_T("spiff_update"));
+	
+	// Add code completion paths (not working!!!)
+	project.AddToExtensions(_T("code_completion/+search_path:add=include_path"));
 
     return true;
 }

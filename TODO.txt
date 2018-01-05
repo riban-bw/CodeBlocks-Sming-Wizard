@@ -23,14 +23,18 @@ Autocomplete works for all Sming classes including libraries
 Ensure SMING_HOME and ESP_HOME are set and valid
 
 
-
 TODO
-Create skeleton wizard.
-Add wizard.png
-Add logo.png
-Create git repository and share
+Create skeleton wizard. DONE
+Add wizard.png. DONE
+Add logo.png. DONE
+Create git repository. DONE
+Share (e.g. github / gitlab)
 Consolidate Makefiles
 Consolidate header files
+Fix clean build target to not include target name
+Add options page:
+	SPIFFS
+	Libraries
 Add C++ parser search paths set to find all Sming elements:
 	$(SMING_HOME)/include
 	$(SMING_HOME)/
@@ -58,4 +62,4 @@ Create installer:
 	Update D:\bin\CodeBlocks\share\CodeBlocks\templates\wizard\config.script to add:
 		    RegisterWizard(wizProject,     _T("sming"),        _T("SMING"),         _T("Console"));
 	Add Compiler with correct Make (can we just get existing make to work?)
-	
+Add auto updater (plugin)
