@@ -9,12 +9,14 @@ Populate:
 	Base folder
 	Project filename (auto populated)
 	Full path (auto populated)
+	Compiler (for make)
+	Comm port
+	Comm speed
 Skeleton project created with:
 	src/application.cpp
 	include/application.h
 	include/user_config.h (is this required?)
 	Makefile
-	Makefile-user.mk (is this required?)
 Build targets:
 	build (all)
 	flash
@@ -28,13 +30,15 @@ Create skeleton wizard. DONE
 Add wizard.png. DONE
 Add logo.png. DONE
 Create git repository. DONE
-Share (e.g. github / gitlab)
-Consolidate Makefiles
-Consolidate header files
-Fix clean build target to not include target name
-Add options page:
+Share (e.g. github / gitlab). DONE
+Consolidate Makefiles. DONE
+Consolidate header files.
+Fix clean build target to not include target name. DONE
+Add options page: DONE
 	SPIFFS
-	Libraries
+	COM port
+	COM speed
+	Upload speed
 Add C++ parser search paths set to find all Sming elements:
 	$(SMING_HOME)/include
 	$(SMING_HOME)/
@@ -58,8 +62,9 @@ Add C++ parser search paths set to find all Sming elements:
 	$(THIRD_PARTY_DIR)/axtls-8266/crypto
 Rationalise Windows Sming / SDK installaton (upstream)
 Create installer:
-	Add sming folder with content to D:\bin\CodeBlocks\share\CodeBlocks\templates\wizard (use relevant path)
-	Update D:\bin\CodeBlocks\share\CodeBlocks\templates\wizard\config.script to add:
+	Add sming folder with content to .../CodeBlocks/share/CodeBlocks/templates/wizard
+	Update .../CodeBlocks/share/CodeBlocks/templates/wizard/config.script to add:
 		    RegisterWizard(wizProject,     _T("sming"),        _T("SMING"),         _T("Console"));
-	Add Compiler with correct Make (can we just get existing make to work?)
 Add auto updater (plugin)
+Add comm port manager (plugin)
+

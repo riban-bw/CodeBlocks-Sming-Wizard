@@ -8,6 +8,25 @@
 //
 ////////////////////////////////////////////////////////////////////////////////
 
+// Helper function to convert integer to boolean
+function IntToBool(val)
+{
+    return (val == 0 ? false : true);
+}
+
+// Helper function to convert boolean to integer
+function BoolToInt(val)
+{
+    return (val ? 1 : 0);
+}
+
+// Wizard global variables
+bSpiffs <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/Spiffs"), 0));
+bRboot <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/Rboot"), 0));
+sComPort <- GetConfigManager().Read(_T("/sming_project_wizard/ComPort"), _T("/dev/ttyUSB0"));
+sBaud <- GetConfigManager().Read(_T("/sming_project_wizard/Baud"), _T("115200"));
+sUploadBaud <- GetConfigManager().Read(_T("/sming_project_wizard/UploadBaud"), sBaud);
+
 function BeginWizard()
 {
     local wiz_type = Wizard.GetWizardType();
@@ -20,9 +39,32 @@ function BeginWizard()
 
         Wizard.AddInfoPage(_T("SMINGIntro"), intro_msg);
         Wizard.AddProjectPathPage();
+		Wizard.AddPage(_T("SmingOptions"));
     }
     else
         print(wiz_type);
+}
+
+// Populate Options page with default values
+function OnEnter_SmingOptions(fwd)
+{
+	Wizard.CheckCheckbox(_T("chkSpiffs"), bSpiffs);
+	Wizard.CheckCheckbox(_T("chkRboot"), bRboot);
+	Wizard.SetTextControlValue(_T("txtComPort"), sComPort);
+	Wizard.SetTextControlValue(_T("txtBaud"), sBaud);
+	Wizard.SetTextControlValue(_T("txtUploadBaud"), sUploadBaud);
+    return true;
+}
+
+// Update global variables with options
+function OnLeave_SmingOptions(fwd)
+{
+	bSpiffs = Wizard.IsCheckboxChecked(_T("chkSpiffs"));
+	bRboot = Wizard.IsCheckboxChecked(_T("chkRboot"));
+	sComPort = Wizard.GetTextControlValue(_T("txtComPort"));
+	sBaud = Wizard.GetTextControlValue(_T("txtBaud"));
+	sUploadBaud = Wizard.GetTextControlValue(_T("txtUploadBaud"));
+	return true;
 }
 
 // -----------------------------------------------------------------------------
@@ -35,6 +77,16 @@ function GetGeneratedFile(file_index)
     {
         local path = Wizard.FindTemplateFile(_T("sming/files/" + filename));
 		local filecontent = IO.ReadFileContents(path);
+		if(filename.Matches(_T("Makefile")))
+		{
+			if(bSpiffs)
+				filecontent.Replace(_T("DISABLE_SPIFFS = 1"), _T("DISABLE_SPIFFS = 0") );
+			if(bRboot)
+				filecontent.Replace(_T("RBOOT_ENABLED = 0"), _T("RBOOT_ENABLED = 1") );
+			filecontent.Replace(_T("COM_PORT ?= /dev/ttyS4"), _T("COM_PORT ?= ") + sComPort );
+			filecontent.Replace(_T("COM_SPEED ?= 115200"), _T("COM_SPEED ?= ") + sBaud );
+			filecontent.Replace(_T("COM_SPEED_ESPTOOL  ?= 115200"), _T("COM_SPEED_ESPTOOL  ?= ") + sUploadBaud );
+		}
         return filename + _T(";") + filecontent;
     }
 	else
@@ -45,7 +97,7 @@ function GetGeneratedFile(file_index)
 // Return template filename based on an index
 function GetTemplateFile(index)
 {
-    if (index == 0)
+    if(index == 0)
 	{
         return _T("Makefile");
     }
@@ -73,12 +125,14 @@ function GetTemplateFile(index)
     return _T("");
 }
 
-
 // Setup the the project
 function SetupProject(project)
 {
     // Set compiler - we only use make from this compiler configuration
-    project.SetCompilerID(_T("cygwin"));
+	if (PLATFORM == PLATFORM_MSW)
+		project.SetCompilerID(_T("cygwin"));
+	else
+		project.SetCompilerID(_T("gcc"));
 
     // We use custom Makefile
     project.SetMakefileCustom(true);
@@ -100,5 +154,12 @@ function SetupProject(project)
 	// Add code completion paths (not working!!!)
 	project.AddToExtensions(_T("code_completion/+search_path:add=include_path"));
 
+	ConfigManager.Write(_T("/sming_project_wizard/Spiffs"), BoolToInt(bSpiffs));
+	ConfigManager.Write(_T("/sming_project_wizard/Rboot"), BoolToInt(bRboot));
+    GetConfigManager().Write(_T("/sming_project_wizard/ComPort"), sComPort);
+    GetConfigManager().Write(_T("/sming_project_wizard/Baud"), sBaud);
+    GetConfigManager().Write(_T("/sming_project_wizard/UploadBaud"), sUploadBaud);
+
     return true;
 }
+

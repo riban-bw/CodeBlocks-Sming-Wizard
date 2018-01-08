@@ -33,6 +33,11 @@ ESP_HOME ?= ~/Sming/esp-toolkit/sdk
 ## SMING_HOME Path where Sming framework is located.
 SMING_HOME ?= ~/Sming/Sming
 
+## TERMINAL: Command to launch serial terminal interface with ESP8266
+ifneq ($(filter CYGWIN%,$(shell uname -s)),)
+TERMINAL     ?= mintty -t "ESP8266 Terminal" --bg 0,0,128 python -m serial.tools.miniterm $(COM_PORT) $(COM_SPEED_SERIAL) $(COM_OPTS)
+endif
+
 # We need to make sure SMING_HOME and ESP_HOME variables are set correctly.
 # Set these above or use enviromental variables to set globally.
 
