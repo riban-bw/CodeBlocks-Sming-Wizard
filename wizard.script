@@ -20,18 +20,31 @@ function BoolToInt(val)
     return (val ? 1 : 0);
 }
 
+		GetConfigManager().Write(_T("/sming_project_wizard/RbootBigFlash"), 0);
+		GetConfigManager().Write(_T("/sming_project_wizard/RbootTwoRoms"), 0);
+		GetConfigManager().Write(_T("/sming_project_wizard/RbootRtc"), 0);
+		GetConfigManager().Write(_T("/sming_project_wizard/RbootGpio"), 0);
+
 // Wizard global variables
 bSpiffs <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/Spiffs"), 0));
+sSpiffsSize <- GetConfigManager().Read(_T("/sming_project_wizard/SpiffsSize"), _T("128"));
 bRboot <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/Rboot"), 0));
+bRbootBigFlash <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/RbootBigFlash"), 1));
+bRbootTwoRoms <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/RbootTwoRoms"), 0));
+Log(_T("bRbootTwoRoms = " + bRbootTwoRoms));
+bRbootRtc <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/RbootRtc"), 0));
+bRbootGpio <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/RbootGpio"), 0));
 sComPort <- GetConfigManager().Read(_T("/sming_project_wizard/ComPort"), _T("/dev/ttyUSB0"));
 sBaud <- GetConfigManager().Read(_T("/sming_project_wizard/Baud"), _T("115200"));
 sUploadBaud <- GetConfigManager().Read(_T("/sming_project_wizard/UploadBaud"), sBaud);
+sSpiSize <- GetConfigManager().Read(_T("/sming_project_wizard/SpiSize"), _T("512"));
+nSpiMode <- GetConfigManager().Read(_T("/sming_project_wizard/SpiMode"), 0);
 
 function BeginWizard()
 {
     local wiz_type = Wizard.GetWizardType();
 
-    if (wiz_type == wizProject)
+    if(wiz_type == wizProject)
     {
         local intro_msg = _T("Welcome to the SMING project wizard!\n" +
                              "This wizard will guide you through creating a new SMING project for the ESP8266.\n\n" +
@@ -45,25 +58,71 @@ function BeginWizard()
         print(wiz_type);
 }
 
+
 // Populate Options page with default values
 function OnEnter_SmingOptions(fwd)
 {
+	if(fwd) //TODO Change to if(fwd)
+	{
+		sFullPath <- Wizard.GetProjectFullFilename();
+		//Come from project path page so validate path
+		if(sFullPath.Matches(_T("* *")))
+		{
+			Message(_T("There are spaces in the path or filename.\n\n" +
+					   "This is known to break rBoot projects.\n\n" +
+					   "It is advised to correct this before creating the project."), _T("Alert"), wxICON_WARNING);
+			
+		}
+	}
 	Wizard.CheckCheckbox(_T("chkSpiffs"), bSpiffs);
+	Wizard.SetTextControlValue(_T("txtSpiffsSize"), sSpiffsSize);
 	Wizard.CheckCheckbox(_T("chkRboot"), bRboot);
+	Wizard.CheckCheckbox(_T("chkRbootBigFlash"), IntToBool(bRbootBigFlash));
+	Wizard.CheckCheckbox(_T("chkRbootTwoRoms"), IntToBool(bRbootTwoRoms));
+	Wizard.CheckCheckbox(_T("chkRbootRtc"), IntToBool(bRbootRtc));
+	Wizard.CheckCheckbox(_T("chkRbootGpio"), IntToBool(bRbootGpio));
 	Wizard.SetTextControlValue(_T("txtComPort"), sComPort);
 	Wizard.SetTextControlValue(_T("txtBaud"), sBaud);
 	Wizard.SetTextControlValue(_T("txtUploadBaud"), sUploadBaud);
+	Wizard.SetTextControlValue(_T("txtSpiSize"), sSpiSize);
+	Wizard.SetComboboxSelection(_T("cmbSpiMode"), nSpiMode);
+	
+	OnClick_chkSpiffs()
+	OnClick_chkRboot()
+	
     return true;
+}
+
+function OnClick_chkSpiffs()
+{
+    bSpiffs = Wizard.IsCheckboxChecked(_T("chkSpiffs"));
+	Wizard.EnableWindow(_T("txtSpiffsSize"), bSpiffs);
+}
+
+function OnClick_chkRboot()
+{
+    bRboot = Wizard.IsCheckboxChecked(_T("chkRboot"));
+	Wizard.EnableWindow(_T("chkRbootBigFlash"), bRboot);
+	Wizard.EnableWindow(_T("chkRbootTwoRoms"), bRboot);
+	Wizard.EnableWindow(_T("chkRbootRtc"), bRboot);
+	Wizard.EnableWindow(_T("chkRbootGpio"), bRboot);
 }
 
 // Update global variables with options
 function OnLeave_SmingOptions(fwd)
 {
 	bSpiffs = Wizard.IsCheckboxChecked(_T("chkSpiffs"));
+	sSpiffsSize = Wizard.GetTextControlValue(_T("txtSpiffsSize"));
 	bRboot = Wizard.IsCheckboxChecked(_T("chkRboot"));
+	bRbootBigFlash = BoolToInt(Wizard.IsCheckboxChecked(_T("chkRbootBigFlash")));
+	bRbootTwoRoms = BoolToInt(Wizard.IsCheckboxChecked(_T("chkRbootTwoRoms")));
+	bRbootRtc = BoolToInt(Wizard.IsCheckboxChecked(_T("chkRbootRtc")));
+	bRbootGpio = BoolToInt(Wizard.IsCheckboxChecked(_T("chkRbootGpio")));
 	sComPort = Wizard.GetTextControlValue(_T("txtComPort"));
 	sBaud = Wizard.GetTextControlValue(_T("txtBaud"));
 	sUploadBaud = Wizard.GetTextControlValue(_T("txtUploadBaud"));
+	sSpiSize = Wizard.GetTextControlValue(_T("txtSpiSize"));
+	nSpiMode = Wizard.GetComboboxSelection(_T("cmbSpiMode"));
 	return true;
 }
 
@@ -80,12 +139,18 @@ function GetGeneratedFile(file_index)
 		if(filename.Matches(_T("Makefile")))
 		{
 			if(bSpiffs)
-				filecontent.Replace(_T("DISABLE_SPIFFS = 1"), _T("DISABLE_SPIFFS = 0") );
+				filecontent.Replace(_T("DISABLE_SPIFFS = 1"), _T("DISABLE_SPIFFS = 0\n" +
+					"SPIFF_SIZE = " + wxString_ToLong(sSpiffsSize) * 1024));
 			if(bRboot)
-				filecontent.Replace(_T("RBOOT_ENABLED = 0"), _T("RBOOT_ENABLED = 1") );
+				filecontent.Replace(_T("RBOOT_ENABLED = 0"), _T("RBOOT_ENABLED = 1\n" +
+					"RBOOT_BIG_FLASH = " + bRbootBigFlash +
+					"\nRBOOT_TWO_ROMS = " + bRbootTwoRoms +
+					"\nRBOOT_RTC_ENABLED = " + bRbootRtc +
+					"\nRBOOT_GPIO_ENABLED = " + bRbootGpio));
 			filecontent.Replace(_T("COM_PORT ?= /dev/ttyS4"), _T("COM_PORT ?= ") + sComPort );
 			filecontent.Replace(_T("COM_SPEED ?= 115200"), _T("COM_SPEED ?= ") + sBaud );
 			filecontent.Replace(_T("COM_SPEED_ESPTOOL  ?= 115200"), _T("COM_SPEED_ESPTOOL  ?= ") + sUploadBaud );
+			//TODO Populate SPI size and mode
 		}
         return filename + _T(";") + filecontent;
     }
@@ -119,7 +184,7 @@ function GetTemplateFile(index)
 	else
     if (index == 4)
     {
-		return _T("files/README.txt");
+		return _T("spiffs/README.txt");
     }
 
     return _T("");
@@ -140,6 +205,7 @@ function SetupProject(project)
     // Remove default targets
     project.RemoveBuildTarget(_T("Debug"));
     project.RemoveBuildTarget(_T("Release"));
+
     // Add targets
 	project.SetMakeCommandFor(mcClean, _T("$make -f $makefile clean"));
     local buildTarget = project.AddBuildTarget(_T("build"));
@@ -154,11 +220,25 @@ function SetupProject(project)
 	// Add code completion paths (not working!!!)
 	project.AddToExtensions(_T("code_completion/+search_path:add=include_path"));
 
+	// Persist user selected option values
 	ConfigManager.Write(_T("/sming_project_wizard/Spiffs"), BoolToInt(bSpiffs));
+	if(bSpiffs)
+	{
+		GetConfigManager().Write(_T("/sming_project_wizard/SpiffsSize"), sSpiffsSize);
+	}
 	ConfigManager.Write(_T("/sming_project_wizard/Rboot"), BoolToInt(bRboot));
+	if(bRboot)
+	{
+		GetConfigManager().Write(_T("/sming_project_wizard/RbootBigFlash"), bRbootBigFlash);
+		GetConfigManager().Write(_T("/sming_project_wizard/RbootTwoRoms"), bRbootTwoRoms);
+		GetConfigManager().Write(_T("/sming_project_wizard/RbootRtc"), bRbootRtc);
+		GetConfigManager().Write(_T("/sming_project_wizard/RbootGpio"), bRbootGpio);
+	}
     GetConfigManager().Write(_T("/sming_project_wizard/ComPort"), sComPort);
     GetConfigManager().Write(_T("/sming_project_wizard/Baud"), sBaud);
     GetConfigManager().Write(_T("/sming_project_wizard/UploadBaud"), sUploadBaud);
+    GetConfigManager().Write(_T("/sming_project_wizard/SpiSize"), sSpiSize);
+    GetConfigManager().Write(_T("/sming_project_wizard/SpiMode"), nSpiMode);
 
     return true;
 }

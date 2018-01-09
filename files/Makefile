@@ -14,6 +14,7 @@ COM_SPEED_ESPTOOL ?= 115200
 
 ## DISABLE_SPIFFS: Set to 1 to disable SPIFFS file system
 DISABLE_SPIFFS = 1
+SPIFF_FILES = spiffs
 
 ## RBOOT_ENABLED: Set to 1 to use rboot boot loader else do not use boot loader
 RBOOT_ENABLED = 0
