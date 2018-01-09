@@ -20,18 +20,12 @@ function BoolToInt(val)
     return (val ? 1 : 0);
 }
 
-		GetConfigManager().Write(_T("/sming_project_wizard/RbootBigFlash"), 0);
-		GetConfigManager().Write(_T("/sming_project_wizard/RbootTwoRoms"), 0);
-		GetConfigManager().Write(_T("/sming_project_wizard/RbootRtc"), 0);
-		GetConfigManager().Write(_T("/sming_project_wizard/RbootGpio"), 0);
-
 // Wizard global variables
 bSpiffs <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/Spiffs"), 0));
 sSpiffsSize <- GetConfigManager().Read(_T("/sming_project_wizard/SpiffsSize"), _T("128"));
 bRboot <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/Rboot"), 0));
 bRbootBigFlash <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/RbootBigFlash"), 1));
 bRbootTwoRoms <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/RbootTwoRoms"), 0));
-Log(_T("bRbootTwoRoms = " + bRbootTwoRoms));
 bRbootRtc <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/RbootRtc"), 0));
 bRbootGpio <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/RbootGpio"), 0));
 sComPort <- GetConfigManager().Read(_T("/sming_project_wizard/ComPort"), _T("/dev/ttyUSB0"));
@@ -77,10 +71,10 @@ function OnEnter_SmingOptions(fwd)
 	Wizard.CheckCheckbox(_T("chkSpiffs"), bSpiffs);
 	Wizard.SetTextControlValue(_T("txtSpiffsSize"), sSpiffsSize);
 	Wizard.CheckCheckbox(_T("chkRboot"), bRboot);
-	Wizard.CheckCheckbox(_T("chkRbootBigFlash"), IntToBool(bRbootBigFlash));
-	Wizard.CheckCheckbox(_T("chkRbootTwoRoms"), IntToBool(bRbootTwoRoms));
-	Wizard.CheckCheckbox(_T("chkRbootRtc"), IntToBool(bRbootRtc));
-	Wizard.CheckCheckbox(_T("chkRbootGpio"), IntToBool(bRbootGpio));
+	Wizard.CheckCheckbox(_T("chkRbootBigFlash"), bRbootBigFlash);
+	Wizard.CheckCheckbox(_T("chkRbootTwoRoms"), bRbootTwoRoms);
+	Wizard.CheckCheckbox(_T("chkRbootRtc"), bRbootRtc);
+	Wizard.CheckCheckbox(_T("chkRbootGpio"), bRbootGpio);
 	Wizard.SetTextControlValue(_T("txtComPort"), sComPort);
 	Wizard.SetTextControlValue(_T("txtBaud"), sBaud);
 	Wizard.SetTextControlValue(_T("txtUploadBaud"), sUploadBaud);
@@ -114,10 +108,10 @@ function OnLeave_SmingOptions(fwd)
 	bSpiffs = Wizard.IsCheckboxChecked(_T("chkSpiffs"));
 	sSpiffsSize = Wizard.GetTextControlValue(_T("txtSpiffsSize"));
 	bRboot = Wizard.IsCheckboxChecked(_T("chkRboot"));
-	bRbootBigFlash = BoolToInt(Wizard.IsCheckboxChecked(_T("chkRbootBigFlash")));
-	bRbootTwoRoms = BoolToInt(Wizard.IsCheckboxChecked(_T("chkRbootTwoRoms")));
-	bRbootRtc = BoolToInt(Wizard.IsCheckboxChecked(_T("chkRbootRtc")));
-	bRbootGpio = BoolToInt(Wizard.IsCheckboxChecked(_T("chkRbootGpio")));
+	bRbootBigFlash = Wizard.IsCheckboxChecked(_T("chkRbootBigFlash"));
+	bRbootTwoRoms = Wizard.IsCheckboxChecked(_T("chkRbootTwoRoms"));
+	bRbootRtc = Wizard.IsCheckboxChecked(_T("chkRbootRtc"));
+	bRbootGpio = Wizard.IsCheckboxChecked(_T("chkRbootGpio"));
 	sComPort = Wizard.GetTextControlValue(_T("txtComPort"));
 	sBaud = Wizard.GetTextControlValue(_T("txtBaud"));
 	sUploadBaud = Wizard.GetTextControlValue(_T("txtUploadBaud"));
@@ -143,10 +137,10 @@ function GetGeneratedFile(file_index)
 					"SPIFF_SIZE = " + wxString_ToLong(sSpiffsSize) * 1024));
 			if(bRboot)
 				filecontent.Replace(_T("RBOOT_ENABLED = 0"), _T("RBOOT_ENABLED = 1\n" +
-					"RBOOT_BIG_FLASH = " + bRbootBigFlash +
-					"\nRBOOT_TWO_ROMS = " + bRbootTwoRoms +
-					"\nRBOOT_RTC_ENABLED = " + bRbootRtc +
-					"\nRBOOT_GPIO_ENABLED = " + bRbootGpio));
+					"RBOOT_BIG_FLASH = " + BoolToInt(bRbootBigFlash) +
+					"\nRBOOT_TWO_ROMS = " + BoolToInt(bRbootTwoRoms) +
+					"\nRBOOT_RTC_ENABLED = " + BoolToInt(bRbootRtc) +
+					"\nRBOOT_GPIO_ENABLED = " + BoolToInt(bRbootGpio)));
 			filecontent.Replace(_T("COM_PORT ?= /dev/ttyS4"), _T("COM_PORT ?= ") + sComPort );
 			filecontent.Replace(_T("COM_SPEED ?= 115200"), _T("COM_SPEED ?= ") + sBaud );
 			filecontent.Replace(_T("COM_SPEED_ESPTOOL  ?= 115200"), _T("COM_SPEED_ESPTOOL  ?= ") + sUploadBaud );
@@ -229,10 +223,10 @@ function SetupProject(project)
 	ConfigManager.Write(_T("/sming_project_wizard/Rboot"), BoolToInt(bRboot));
 	if(bRboot)
 	{
-		GetConfigManager().Write(_T("/sming_project_wizard/RbootBigFlash"), bRbootBigFlash);
-		GetConfigManager().Write(_T("/sming_project_wizard/RbootTwoRoms"), bRbootTwoRoms);
-		GetConfigManager().Write(_T("/sming_project_wizard/RbootRtc"), bRbootRtc);
-		GetConfigManager().Write(_T("/sming_project_wizard/RbootGpio"), bRbootGpio);
+		GetConfigManager().Write(_T("/sming_project_wizard/RbootBigFlash"), BoolToInt(bRbootBigFlash));
+		GetConfigManager().Write(_T("/sming_project_wizard/RbootTwoRoms"), BoolToInt(bRbootTwoRoms));
+		GetConfigManager().Write(_T("/sming_project_wizard/RbootRtc"), BoolToInt(bRbootRtc));
+		GetConfigManager().Write(_T("/sming_project_wizard/RbootGpio"), BoolToInt(bRbootGpio));
 	}
     GetConfigManager().Write(_T("/sming_project_wizard/ComPort"), sComPort);
     GetConfigManager().Write(_T("/sming_project_wizard/Baud"), sBaud);
