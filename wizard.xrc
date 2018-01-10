@@ -11,195 +11,238 @@
 				<border>8</border>
 			</object>
 			<object class="sizeritem">
-				<object class="wxStaticBoxSizer">
-					<label>File System Settings</label>
-					<orient>wxVERTICAL</orient>
+				<object class="wxBoxSizer">
+					<orient>wxHORIZONTAL</orient>
 					<object class="sizeritem">
-						<object class="wxCheckBox" name="chkSpiffs">
-							<label>Enable SPIFFS</label>
+						<object class="wxStaticBoxSizer">
+							<label>File System Settings</label>
+							<orient>wxVERTICAL</orient>
+							<object class="sizeritem">
+								<object class="wxCheckBox" name="chkSpiffs">
+									<label>Enable SPIFFS</label>
+								</object>
+								<flag>wxALL</flag>
+								<border>8</border>
+							</object>
+							<object class="sizeritem">
+								<object class="wxBoxSizer">
+									<object class="sizeritem">
+										<object class="wxStaticText" name="lblSpiffsSize">
+											<label>SPIFFS Size:</label>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>8</border>
+									</object>
+									<object class="sizeritem">
+										<object class="wxTextCtrl" name="txtSpiffsSize" />
+										<flag>wxALL|wxEXPAND</flag>
+										<border>8</border>
+										<option>1</option>
+									</object>
+								</object>
+								<flag>wxEXPAND</flag>
+							</object>
 						</object>
-						<flag>wxALL</flag>
+						<flag>wxALL|wxEXPAND</flag>
 						<border>8</border>
 					</object>
 					<object class="sizeritem">
-						<object class="wxBoxSizer">
+						<object class="wxStaticBoxSizer">
+							<label>Boot Loader Settings</label>
+							<orient>wxVERTICAL</orient>
 							<object class="sizeritem">
-								<object class="wxStaticText" name="lblSpiffsSize">
-									<label>SPIFFS Size:</label>
+								<object class="wxCheckBox" name="chkRboot">
+									<label>Use rBoot bootloader</label>
 								</object>
-								<flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
+								<flag>wxALL</flag>
 								<border>8</border>
 							</object>
 							<object class="sizeritem">
-								<object class="wxTextCtrl" name="txtSpiffsSize" />
-								<flag>wxALL|wxEXPAND</flag>
+								<object class="wxCheckBox" name="chkRbootBigFlash">
+									<label>Big Flash</label>
+								</object>
+								<flag>wxALL</flag>
 								<border>8</border>
-								<option>1</option>
+							</object>
+							<object class="sizeritem">
+								<object class="wxCheckBox" name="chkRbootTwoRoms">
+									<label>Two ROMs</label>
+								</object>
+								<flag>wxALL</flag>
+								<border>8</border>
+							</object>
+							<object class="sizeritem">
+								<object class="wxCheckBox" name="chkRbootRtc">
+									<label>Enable RTC</label>
+								</object>
+								<flag>wxALL</flag>
+								<border>8</border>
+							</object>
+							<object class="sizeritem">
+								<object class="wxCheckBox" name="chkRbootGpio">
+									<label>Enable GPIO boot</label>
+								</object>
+								<flag>wxALL</flag>
+								<border>8</border>
 							</object>
 						</object>
-						<flag>wxEXPAND</flag>
+						<flag>wxALL|wxEXPAND</flag>
+						<border>8</border>
 					</object>
 				</object>
-				<flag>wxALL|wxEXPAND</flag>
-				<border>8</border>
 			</object>
 			<object class="sizeritem">
-				<object class="wxStaticBoxSizer">
-					<label>Boot Loader Settings</label>
-					<orient>wxVERTICAL</orient>
+				<object class="wxBoxSizer">
+					<orient>wxHORIZONTAL</orient>
 					<object class="sizeritem">
-						<object class="wxCheckBox" name="chkRboot">
-							<label>Use rBoot bootloader</label>
+						<object class="wxStaticBoxSizer">
+							<label>Serial Port Settings</label>
+							<orient>wxVERTICAL</orient>
+							<object class="sizeritem">
+								<object class="wxBoxSizer">
+									<object class="sizeritem">
+										<object class="wxStaticText" name="m_staticText2">
+											<label>COM Port:</label>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>8</border>
+									</object>
+									<object class="sizeritem">
+										<object class="wxTextCtrl" name="txtComPort" />
+										<flag>wxALL|wxEXPAND</flag>
+										<border>8</border>
+										<option>1</option>
+									</object>
+								</object>
+								<flag>wxEXPAND</flag>
+							</object>
+							<object class="sizeritem">
+								<object class="wxBoxSizer">
+									<object class="sizeritem">
+										<object class="wxStaticText" name="m_staticText2">
+											<label>Baud rate:</label>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>8</border>
+									</object>
+									<object class="sizeritem">
+										<object class="wxTextCtrl" name="txtBaud" />
+										<flag>wxALL|wxEXPAND</flag>
+										<border>8</border>
+										<option>1</option>
+									</object>
+								</object>
+								<flag>wxEXPAND</flag>
+							</object>
+							<object class="sizeritem">
+								<object class="wxBoxSizer">
+									<object class="sizeritem">
+										<object class="wxStaticText" name="m_staticText3">
+											<label>Upload speed:</label>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>8</border>
+									</object>
+									<object class="sizeritem">
+										<object class="wxTextCtrl" name="txtUploadBaud" />
+										<flag>wxALL|wxEXPAND</flag>
+										<border>8</border>
+										<option>1</option>
+									</object>
+								</object>
+								<flag>wxEXPAND</flag>
+							</object>
 						</object>
-						<flag>wxALL</flag>
+						<flag>wxALL|wxEXPAND</flag>
 						<border>8</border>
 					</object>
 					<object class="sizeritem">
-						<object class="wxCheckBox" name="chkRbootBigFlash">
-							<label>Big Flash</label>
+						<object class="wxStaticBoxSizer">
+							<label>ESP8266 Settings</label>
+							<orient>wxVERTICAL</orient>
+							<object class="sizeritem">
+								<object class="wxBoxSizer">
+									<object class="sizeritem">
+										<object class="wxStaticText" name="lblSpiSize">
+											<label>SPI Size:</label>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>8</border>
+									</object>
+									<object class="sizeritem">
+										<object class="wxTextCtrl" name="txtSpiSize" />
+										<flag>wxALL|wxEXPAND</flag>
+										<border>8</border>
+										<option>1</option>
+									</object>
+								</object>
+								<flag>wxEXPAND</flag>
+							</object>
+							<object class="sizeritem">
+								<object class="wxBoxSizer">
+									<object class="sizeritem">
+										<object class="wxStaticText" name="lblSpiClock">
+											<label>SPI Clock (MHz):</label>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>8</border>
+									</object>
+									<object class="sizeritem">
+										<object class="wxComboBox" name="cmbSpiClock">
+											<style>wxCB_READONLY</style>
+											<value>40</value>
+											<content>
+												<item>20</item>
+												<item>26</item>
+												<item>40</item>
+												<item>80</item>
+											</content>
+										</object>
+										<flag>wxALL|wxEXPAND</flag>
+										<border>8</border>
+										<option>1</option>
+									</object>
+								</object>
+								<flag>wxEXPAND</flag>
+							</object>
+							<object class="sizeritem">
+								<object class="wxBoxSizer">
+									<object class="sizeritem">
+										<object class="wxStaticText" name="lblSpiMode">
+											<label>SPI Mode:</label>
+										</object>
+										<flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
+										<border>8</border>
+									</object>
+									<object class="sizeritem">
+										<object class="wxComboBox" name="cmbSpiMode">
+											<style>wxCB_READONLY</style>
+											<value>qio</value>
+											<content>
+												<item>qio</item>
+												<item>qout</item>
+												<item>dio</item>
+												<item>dout</item>
+											</content>
+										</object>
+										<flag>wxALL|wxEXPAND</flag>
+										<border>8</border>
+										<option>1</option>
+									</object>
+								</object>
+								<flag>wxEXPAND</flag>
+							</object>
 						</object>
-						<flag>wxALL</flag>
-						<border>8</border>
-					</object>
-					<object class="sizeritem">
-						<object class="wxCheckBox" name="chkRbootTwoRoms">
-							<label>Two ROMs</label>
-						</object>
-						<flag>wxALL</flag>
-						<border>8</border>
-					</object>
-					<object class="sizeritem">
-						<object class="wxCheckBox" name="chkRbootRtc">
-							<label>Enable RTC</label>
-						</object>
-						<flag>wxALL</flag>
-						<border>8</border>
-					</object>
-					<object class="sizeritem">
-						<object class="wxCheckBox" name="chkRbootGpio">
-							<label>Enable GPIO boot</label>
-						</object>
-						<flag>wxALL</flag>
+						<flag>wxALL|wxEXPAND</flag>
 						<border>8</border>
 					</object>
 				</object>
-				<flag>wxALL|wxEXPAND</flag>
-				<border>8</border>
 			</object>
 			<object class="sizeritem">
-				<object class="wxStaticBoxSizer">
-					<label>Serial Port Settings</label>
-					<orient>wxVERTICAL</orient>
-					<object class="sizeritem">
-						<object class="wxBoxSizer">
-							<object class="sizeritem">
-								<object class="wxStaticText" name="m_staticText2">
-									<label>COM Port:</label>
-								</object>
-								<flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
-								<border>8</border>
-							</object>
-							<object class="sizeritem">
-								<object class="wxTextCtrl" name="txtComPort" />
-								<flag>wxALL|wxEXPAND</flag>
-								<border>8</border>
-								<option>1</option>
-							</object>
-						</object>
-						<flag>wxEXPAND</flag>
-					</object>
-					<object class="sizeritem">
-						<object class="wxBoxSizer">
-							<object class="sizeritem">
-								<object class="wxStaticText" name="m_staticText2">
-									<label>Baud rate:</label>
-								</object>
-								<flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
-								<border>8</border>
-							</object>
-							<object class="sizeritem">
-								<object class="wxTextCtrl" name="txtBaud" />
-								<flag>wxALL|wxEXPAND</flag>
-								<border>8</border>
-								<option>1</option>
-							</object>
-						</object>
-						<flag>wxEXPAND</flag>
-					</object>
-					<object class="sizeritem">
-						<object class="wxBoxSizer">
-							<object class="sizeritem">
-								<object class="wxStaticText" name="m_staticText3">
-									<label>Upload speed:</label>
-								</object>
-								<flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
-								<border>8</border>
-							</object>
-							<object class="sizeritem">
-								<object class="wxTextCtrl" name="txtUploadBaud" />
-								<flag>wxALL|wxEXPAND</flag>
-								<border>8</border>
-								<option>1</option>
-							</object>
-						</object>
-						<flag>wxEXPAND</flag>
-					</object>
+				<object class="wxButton" name="btnReset">
+					<label>Reset to defaults</label>
 				</object>
-				<flag>wxALL|wxEXPAND</flag>
-				<border>8</border>
-			</object>
-			<object class="sizeritem">
-				<object class="wxStaticBoxSizer">
-					<label>ESP8266 Settings</label>
-					<orient>wxVERTICAL</orient>
-					<object class="sizeritem">
-						<object class="wxBoxSizer">
-							<object class="sizeritem">
-								<object class="wxStaticText" name="lblSpiSize">
-									<label>SPI Size:</label>
-								</object>
-								<flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
-								<border>8</border>
-							</object>
-							<object class="sizeritem">
-								<object class="wxTextCtrl" name="txtSpiSize" />
-								<flag>wxALL|wxEXPAND</flag>
-								<border>8</border>
-								<option>1</option>
-							</object>
-						</object>
-						<flag>wxEXPAND</flag>
-					</object>
-					<object class="sizeritem">
-						<object class="wxBoxSizer">
-							<object class="sizeritem">
-								<object class="wxStaticText" name="lblSpiMode">
-									<label>SPI Mode:</label>
-								</object>
-								<flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
-								<border>8</border>
-							</object>
-							<object class="sizeritem">
-								<object class="wxComboBox" name="cmbSpiMode">
-									<style>wxCB_READONLY</style>
-									<value>qio</value>
-									<content>
-										<item>qio</item>
-										<item>qout</item>
-										<item>dio</item>
-										<item>dout</item>
-									</content>
-								</object>
-								<flag>wxALL|wxEXPAND</flag>
-								<border>8</border>
-								<option>1</option>
-							</object>
-						</object>
-						<flag>wxEXPAND</flag>
-					</object>
-				</object>
-				<flag>wxALL|wxEXPAND</flag>
-				<border>8</border>
+				<flag>wxALL|wxALIGN_RIGHT</flag>
 			</object>
 		</object>
 	</object>

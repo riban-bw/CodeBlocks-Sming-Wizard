@@ -34,6 +34,15 @@ ESP_HOME ?= ~/Sming/esp-toolkit/sdk
 ## SMING_HOME Path where Sming framework is located.
 SMING_HOME ?= ~/Sming/Sming
 
+## SPI_SIZE: ESP8266 flash memory size
+SPI_SIZE ?= 4M
+
+## SPI_SPEED: ESP8266 clock speed
+SPI_SPEED ?= 40
+
+## SPI_MODE: ESP8266 transfer mode
+SPI_MODE ?= qio
+
 ## TERMINAL: Command to launch serial terminal interface with ESP8266
 ifneq ($(filter CYGWIN%,$(shell uname -s)),)
 TERMINAL     ?= mintty -t "ESP8266 Terminal" --bg 0,0,128 python -m serial.tools.miniterm $(COM_PORT) $(COM_SPEED_SERIAL) $(COM_OPTS)
