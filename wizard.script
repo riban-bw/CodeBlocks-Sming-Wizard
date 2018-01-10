@@ -22,7 +22,7 @@ function BoolToInt(val)
 
 // Wizard global variables
 bSpiffs <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/Spiffs"), 0));
-sSpiffsSize <- GetConfigManager().Read(_T("/sming_project_wizard/SpiffsSize"), _T("128"));
+sSpiffsSize <- GetConfigManager().Read(_T("/sming_project_wizard/SpiffsSize"), _T("128K"));
 bRboot <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/Rboot"), 0));
 bRbootBigFlash <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/RbootBigFlash"), 1));
 bRbootTwoRoms <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/RbootTwoRoms"), 0));
@@ -31,7 +31,7 @@ bRbootGpio <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/RbootG
 sComPort <- GetConfigManager().Read(_T("/sming_project_wizard/ComPort"), _T("/dev/ttyUSB0"));
 sBaud <- GetConfigManager().Read(_T("/sming_project_wizard/Baud"), _T("115200"));
 sUploadBaud <- GetConfigManager().Read(_T("/sming_project_wizard/UploadBaud"), sBaud);
-sSpiSize <- GetConfigManager().Read(_T("/sming_project_wizard/SpiSize"), _T("512"));
+nSpiSize <- GetConfigManager().Read(_T("/sming_project_wizard/SpiSize"), 1);
 nSpiMode <- GetConfigManager().Read(_T("/sming_project_wizard/SpiMode"), 0);
 nSpiClock <- GetConfigManager().Read(_T("/sming_project_wizard/SpiClock"), 2);
 
@@ -79,7 +79,7 @@ function OnEnter_SmingOptions(fwd)
 	Wizard.SetTextControlValue(_T("txtComPort"), sComPort);
 	Wizard.SetTextControlValue(_T("txtBaud"), sBaud);
 	Wizard.SetTextControlValue(_T("txtUploadBaud"), sUploadBaud);
-	Wizard.SetTextControlValue(_T("txtSpiSize"), sSpiSize);
+	Wizard.SetComboboxSelection(_T("cmbSpiSize"), nSpiSize);
 	Wizard.SetComboboxSelection(_T("cmbSpiMode"), nSpiMode);
 	Wizard.SetComboboxSelection(_T("cmbSpiClock"), nSpiClock);
 	
@@ -107,7 +107,7 @@ function OnClick_chkRboot()
 function OnClick_btnReset()
 {
 	Wizard.CheckCheckbox(_T("chkSpiffs"), false);
-	Wizard.SetTextControlValue(_T("txtSpiffsSize"), _T(""));
+	Wizard.SetTextControlValue(_T("txtSpiffsSize"), _T("128K"));
 	Wizard.CheckCheckbox(_T("chkRboot"), false);
 	Wizard.CheckCheckbox(_T("chkRbootBigFlash"), true);
 	Wizard.CheckCheckbox(_T("chkRbootTwoRoms"), false);
@@ -116,7 +116,7 @@ function OnClick_btnReset()
 	Wizard.SetTextControlValue(_T("txtComPort"), _T("/dev/ttyUSB0"));
 	Wizard.SetTextControlValue(_T("txtBaud"), _T("115200"));
 	Wizard.SetTextControlValue(_T("txtUploadBaud"), _T("115200"));
-	Wizard.SetTextControlValue(_T("txtSpiSize"), _T("512"));
+	Wizard.SetComboboxSelection(_T("cmbSpiSize"), 1);
 	Wizard.SetComboboxSelection(_T("cmbSpiMode"), 0);
 	Wizard.SetComboboxSelection(_T("cmbSpiClock"), 2);
 	OnClick_chkRboot();
@@ -136,7 +136,7 @@ function OnLeave_SmingOptions(fwd)
 	sComPort = Wizard.GetTextControlValue(_T("txtComPort"));
 	sBaud = Wizard.GetTextControlValue(_T("txtBaud"));
 	sUploadBaud = Wizard.GetTextControlValue(_T("txtUploadBaud"));
-	sSpiSize = Wizard.GetTextControlValue(_T("txtSpiSize"));
+	nSpiSize = Wizard.GetComboboxSelection(_T("cmbSpiSize"));
 	nSpiMode = Wizard.GetComboboxSelection(_T("cmbSpiMode"));
 	nSpiClock = Wizard.GetComboboxSelection(_T("cmbSpiClock"));
 	return true;
@@ -155,8 +155,15 @@ function GetGeneratedFile(file_index)
 		if(filename.Matches(_T("Makefile")))
 		{
 			if(bSpiffs)
+				lSpiffsSize <- 0;
+				if(sSpiffsSize.Right(1).Upper().Matches(_T("K")))
+					lSpiffsSize = wxString_ToLong(sSpiffsSize.Mid(0, sSpiffsSize.Length() - 1)) * 1024;
+				else if(sSpiffsSize.Right(1).Upper().Matches(_T("M")))
+					lSpiffsSize = wxString_ToLong(sSpiffsSize.Mid(0, sSpiffsSize.Length() - 1)) * 1024 * 1024;
+				else
+					lSpiffsSize = wxString_ToLong(sSpiffsSize);
 				filecontent.Replace(_T("DISABLE_SPIFFS = 1"), _T("DISABLE_SPIFFS = 0\n" +
-					"SPIFF_SIZE = " + wxString_ToLong(sSpiffsSize) * 1024));
+					"SPIFF_SIZE = " + lSpiffsSize));
 			if(bRboot)
 				filecontent.Replace(_T("RBOOT_ENABLED = 0"), _T("RBOOT_ENABLED = 1\n" +
 					"RBOOT_BIG_FLASH = " + BoolToInt(bRbootBigFlash) +
@@ -253,7 +260,7 @@ function SetupProject(project)
     GetConfigManager().Write(_T("/sming_project_wizard/ComPort"), sComPort);
     GetConfigManager().Write(_T("/sming_project_wizard/Baud"), sBaud);
     GetConfigManager().Write(_T("/sming_project_wizard/UploadBaud"), sUploadBaud);
-    GetConfigManager().Write(_T("/sming_project_wizard/SpiSize"), sSpiSize);
+    GetConfigManager().Write(_T("/sming_project_wizard/SpiSize"), nSpiSize);
     GetConfigManager().Write(_T("/sming_project_wizard/SpiMode"), nSpiMode);
     GetConfigManager().Write(_T("/sming_project_wizard/SpiClock"), nSpiClock);
 
