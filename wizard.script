@@ -155,6 +155,7 @@ function GetGeneratedFile(file_index)
 		if(filename.Matches(_T("Makefile")))
 		{
 			if(bSpiffs)
+			{
 				lSpiffsSize <- 0;
 				if(sSpiffsSize.Right(1).Upper().Matches(_T("K")))
 					lSpiffsSize = wxString_ToLong(sSpiffsSize.Mid(0, sSpiffsSize.Length() - 1)) * 1024;
@@ -164,12 +165,15 @@ function GetGeneratedFile(file_index)
 					lSpiffsSize = wxString_ToLong(sSpiffsSize);
 				filecontent.Replace(_T("DISABLE_SPIFFS = 1"), _T("DISABLE_SPIFFS = 0\n" +
 					"SPIFF_SIZE = " + lSpiffsSize));
+			}
 			if(bRboot)
+			{
 				filecontent.Replace(_T("RBOOT_ENABLED = 0"), _T("RBOOT_ENABLED = 1\n" +
 					"RBOOT_BIG_FLASH = " + BoolToInt(bRbootBigFlash) +
 					"\nRBOOT_TWO_ROMS = " + BoolToInt(bRbootTwoRoms) +
 					"\nRBOOT_RTC_ENABLED = " + BoolToInt(bRbootRtc) +
 					"\nRBOOT_GPIO_ENABLED = " + BoolToInt(bRbootGpio)));
+			}
 			filecontent.Replace(_T("COM_PORT ?= /dev/ttyS4"), _T("COM_PORT ?= ") + sComPort );
 			filecontent.Replace(_T("COM_SPEED ?= 115200"), _T("COM_SPEED ?= ") + sBaud );
 			filecontent.Replace(_T("COM_SPEED_ESPTOOL  ?= 115200"), _T("COM_SPEED_ESPTOOL  ?= ") + sUploadBaud );
@@ -218,7 +222,7 @@ function SetupProject(project)
 {
     // Set compiler - we only use make from this compiler configuration
 	if (PLATFORM == PLATFORM_MSW)
-		project.SetCompilerID(_T("cygwin"));
+		project.SetCompilerID(_T("cygwin")); //cygwin make provides POSIX envirnment in Windows
 	else
 		project.SetCompilerID(_T("gcc"));
 
@@ -229,7 +233,7 @@ function SetupProject(project)
     project.RemoveBuildTarget(_T("Debug"));
     project.RemoveBuildTarget(_T("Release"));
 
-    // Add targets
+    // Add targets and fix clean rule
 	project.SetMakeCommandFor(mcClean, _T("$make -f $makefile clean"));
     local buildTarget = project.AddBuildTarget(_T("build"));
 	buildTarget.SetMakeCommandFor(mcClean, _T("$make -f $makefile clean"));
@@ -241,7 +245,32 @@ function SetupProject(project)
 	buildTarget.SetMakeCommandFor(mcClean, _T("$make -f $makefile clean"));
 	
 	// Add code completion paths (not working!!!)
-	project.AddToExtensions(_T("code_completion/+search_path:add=include_path"));
+	project.AddToExtensions(_T("code_completion/+search_path:add=$(#SMING)/"));
+	project.Save();
+	project.AddToExtensions(_T("code_completion/+search_path:add=$(#SMING)/"));
+	/* TODO Add following paths to code_completion/+search_path
+	$(#SMING)/ (required for SmingCore/SmingCore.h which provides most Sming includes)
+	$(#SMING/third-party)/rboot (required for rboot-api)
+	$(#SMING/third-party)/rboot/appcode (required for rboot-api)
+	$(#SMING/third-party)/spiffs/src (spiffs.h provides constants)
+	$(#SMING)/include (not required)
+	$(#SMING)/system/esp-lwip/lwip/include (does not exist - may need lwip and lwip/app)
+	$(#SMING)/third-party/esp-open-lwip/include (not sure this helps much)
+	$(#SMING)/third-party/lwip2/glue-esp/include-esp
+	$(#SMING)/third-party/lwip2/include
+	$(#SMING)/system/include (Not required? Seems to implement functions pointed to by other available functions, e.g. printf_P)
+	$(#SMING)/Wiring (not required - picked up by SmingCore.h)
+	$(#SMING)/Libraries (not required - picked up by SmingCore.h)
+	$(#SMING)/Libraries/Adafruit_GFX (not required - picked up by SmingCore.h)
+	$(#SMING)/SmingCore (not required - picked up by SmingCore.h)
+	$(#SMING)/Services/SpifFS (don't think we need this)
+	$(SDK_BASE)/../include (doesn't exist)
+	$(#SMING/third-party)/gdbstub (does not exist - there is a gdb directory but this does not parse anyway)
+	$(#SMING/third-party)/axtls-8266 (nothing in this directory - prob not required)
+	$(#SMING/third-party)/axtls-8266/ssl (do we need this?)
+	$(#SMING/third-party)/axtls-8266/crypto (do we need this?)
+
+	*/
 
 	// Persist user selected option values
 	ConfigManager.Write(_T("/sming_project_wizard/Spiffs"), BoolToInt(bSpiffs));
