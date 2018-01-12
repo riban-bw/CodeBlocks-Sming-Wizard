@@ -237,6 +237,53 @@
 				</object>
 			</object>
 			<object class="sizeritem">
+				<flag>wxALL|wxEXPAND</flag>
+				<border>8</border>
+				<object class="wxStaticBoxSizer">
+					<label>System pathes</label>
+					<orient>wxVERTICAL</orient>
+					<object class="sizeritem">
+						<flag>wxALL</flag>
+						<border>8</border>
+						<object class="wxCheckBox" name="chkCustomPath">
+							<label>use custom path settings</label>
+						</object>
+					</object>
+					<object class="sizeritem">
+						<flag>wxEXPAND</flag>
+						<object class="wxFlexGridSizer">
+							<cols>2</cols>
+							<object class="sizeritem">
+								<flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>8</border>
+								<object class="wxStaticText" name="lblEspHome">
+									<label>ESP_HOME = </label>
+								</object>
+							</object>
+							<object class="sizeritem">
+								<flag>wxALL|wxEXPAND|wxALIGN_RIGHT</flag>
+								<border>8</border>
+								<option>1</option>
+								<object class="wxTextCtrl" name="txtEspHome" />
+							</object>
+							<object class="sizeritem">
+								<flag>wxALL|wxALIGN_CENTER_VERTICAL</flag>
+								<border>8</border>
+								<object class="wxStaticText" name="lblSmingHome">
+									<label>SMING_HOME = </label>
+								</object>
+							</object>
+							<object class="sizeritem">
+								<flag>wxALL|wxEXPAND|wxALIGN_RIGHT</flag>
+								<border>8</border>
+								<option>1</option>
+								<object class="wxTextCtrl" name="txtSmingHome" />
+							</object>
+						</object>
+					</object>
+				</object>
+			</object>
+                        <object class="sizeritem">
 				<object class="wxButton" name="btnReset">
 				<flag>wxALL|wxALIGN_RIGHT</flag>
 					<label>Reset to defaults</label>

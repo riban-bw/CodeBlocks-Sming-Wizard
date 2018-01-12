@@ -34,6 +34,9 @@ sUploadBaud <- GetConfigManager().Read(_T("/sming_project_wizard/UploadBaud"), s
 nSpiSize <- GetConfigManager().Read(_T("/sming_project_wizard/SpiSize"), 1);
 nSpiMode <- GetConfigManager().Read(_T("/sming_project_wizard/SpiMode"), 0);
 nSpiClock <- GetConfigManager().Read(_T("/sming_project_wizard/SpiClock"), 2);
+bCustomPath <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/CustomPath"), 0));
+sEspHome <- GetConfigManager().Read(_T("/sming_project_wizard/EspHome"), _T("~/Sming/esp-toolkit/sdk"));
+sSmingHome <- GetConfigManager().Read(_T("/sming_project_wizard/SmingHome"), _T("~/Sming/Sming"));
 
 function BeginWizard()
 {
@@ -82,9 +85,13 @@ function OnEnter_SmingOptions(fwd)
 	Wizard.SetComboboxSelection(_T("cmbSpiSize"), nSpiSize);
 	Wizard.SetComboboxSelection(_T("cmbSpiMode"), nSpiMode);
 	Wizard.SetComboboxSelection(_T("cmbSpiClock"), nSpiClock);
+	Wizard.CheckCheckbox(_T("chkCustomPath"), bCustomPath);
+	Wizard.SetTextControlValue(_T("txtEspHome"), sEspHome);
+	Wizard.SetTextControlValue(_T("txtSmingHome"), sSmingHome);
 	
 	OnClick_chkSpiffs()
 	OnClick_chkRboot()
+	OnClick_chkCustomPath()
 	
     return true;
 }
@@ -104,6 +111,13 @@ function OnClick_chkRboot()
 	Wizard.EnableWindow(_T("chkRbootGpio"), bRboot);
 }
 
+function OnClick_chkCustomPath()
+{
+    bCustomPath = Wizard.IsCheckboxChecked(_T("chkCustomPath"));
+	Wizard.EnableWindow(_T("txtEspHome"), bCustomPath);
+	Wizard.EnableWindow(_T("txtSmingHome"), bCustomPath);
+}
+
 function OnClick_btnReset()
 {
 	Wizard.CheckCheckbox(_T("chkSpiffs"), false);
@@ -119,8 +133,12 @@ function OnClick_btnReset()
 	Wizard.SetComboboxSelection(_T("cmbSpiSize"), 1);
 	Wizard.SetComboboxSelection(_T("cmbSpiMode"), 0);
 	Wizard.SetComboboxSelection(_T("cmbSpiClock"), 2);
+        Wizard.CheckCheckbox(_T("chkCustomPath"), false);
+        Wizard.SetTextControlValue(_T("txtEspHome"), _T("~/Sming/esp-toolkit/sdk"));
+	Wizard.SetTextControlValue(_T("txtSmingHome"), _T("~/Sming/Sming"));
 	OnClick_chkRboot();
 	OnClick_chkSpiffs();
+	OnClick_chkCustomPath();
 }
 
 // Update global variables with options
@@ -139,6 +157,9 @@ function OnLeave_SmingOptions(fwd)
 	nSpiSize = Wizard.GetComboboxSelection(_T("cmbSpiSize"));
 	nSpiMode = Wizard.GetComboboxSelection(_T("cmbSpiMode"));
 	nSpiClock = Wizard.GetComboboxSelection(_T("cmbSpiClock"));
+        bCustomPath = Wizard.IsCheckboxChecked(_T("chkCustomPath"));
+        sEspHome = Wizard.GetTextControlValue(_T("txtEspHome"));
+        sSmingHome = Wizard.GetTextControlValue(_T("txtSmingHome"));
 	return true;
 }
 
@@ -177,7 +198,44 @@ function GetGeneratedFile(file_index)
 			filecontent.Replace(_T("COM_PORT ?= /dev/ttyS4"), _T("COM_PORT ?= ") + sComPort );
 			filecontent.Replace(_T("COM_SPEED ?= 115200"), _T("COM_SPEED ?= ") + sBaud );
 			filecontent.Replace(_T("COM_SPEED_ESPTOOL  ?= 115200"), _T("COM_SPEED_ESPTOOL  ?= ") + sUploadBaud );
-			//TODO Populate SPI size and mode
+                        if(nSpiSize==0)
+                        {
+                                filecontent.Replace(_T("SPI_SIZE ?= 4M"), _T("SPI_SIZE ?= 256k"));
+                        } else if(nSpiSize==1)
+                        {
+                                filecontent.Replace(_T("SPI_SIZE ?= 4M"), _T("SPI_SIZE ?= 512k"));
+                        } else if(nSpiSize==2)
+                        {
+                                filecontent.Replace(_T("SPI_SIZE ?= 4M"), _T("SPI_SIZE ?= 1M"));
+                        } else if(nSpiSize==3)
+                        {
+                                filecontent.Replace(_T("SPI_SIZE ?= 4M"), _T("SPI_SIZE ?= 2M"));
+                        }
+                        if(nSpiClock==0)
+                        {
+                                filecontent.Replace(_T("SPI_SPEED ?= 40"), _T("SPI_SPEED ?= 20"));
+                        } else if(nSpiClock==1)
+                        {
+                                filecontent.Replace(_T("SPI_SPEED ?= 40"), _T("SPI_SPEED ?= 26"));
+                        } else if(nSpiClock==3)
+                        {
+                                filecontent.Replace(_T("SPI_SPEED ?= 40"), _T("SPI_SPEED ?= 80"));
+                        }
+                        if(nSpiMode==1)
+                        {
+                                filecontent.Replace(_T("SPI_MODE ?= qio"), _T("SPI_MODE ?= qout"));
+                        } else if(nSpiClock==2)
+                        {
+                                filecontent.Replace(_T("SPI_MODE ?= qio"), _T("SPI_MODE ?= dio"));
+                        } else if(nSpiClock==3)
+                        {
+                                filecontent.Replace(_T("SPI_MODE ?= qio"), _T("SPI_MODE ?= dout"));
+                        }
+			if(bCustomPath)
+			{
+                                filecontent.Replace(_T("ESP_HOME ?= ~/Sming/esp-toolkit/sdk"), _T("ESP_HOME ?= ") + sEspHome);
+                                filecontent.Replace(_T("SMING_HOME ?= ~/Sming/Sming"), _T("SMING_HOME ?= ") + sSmingHome);
+                        }
 		}
         return filename + _T(";") + filecontent;
     }
@@ -284,12 +342,17 @@ function SetupProject(project)
 		GetConfigManager().Write(_T("/sming_project_wizard/RbootRtc"), BoolToInt(bRbootRtc));
 		GetConfigManager().Write(_T("/sming_project_wizard/RbootGpio"), BoolToInt(bRbootGpio));
 	}
-    GetConfigManager().Write(_T("/sming_project_wizard/ComPort"), sComPort);
-    GetConfigManager().Write(_T("/sming_project_wizard/Baud"), sBaud);
-    GetConfigManager().Write(_T("/sming_project_wizard/UploadBaud"), sUploadBaud);
-    GetConfigManager().Write(_T("/sming_project_wizard/SpiSize"), nSpiSize);
-    GetConfigManager().Write(_T("/sming_project_wizard/SpiMode"), nSpiMode);
-    GetConfigManager().Write(_T("/sming_project_wizard/SpiClock"), nSpiClock);
+        GetConfigManager().Write(_T("/sming_project_wizard/ComPort"), sComPort);
+        GetConfigManager().Write(_T("/sming_project_wizard/Baud"), sBaud);
+        GetConfigManager().Write(_T("/sming_project_wizard/UploadBaud"), sUploadBaud);
+        GetConfigManager().Write(_T("/sming_project_wizard/SpiSize"), nSpiSize);
+        GetConfigManager().Write(_T("/sming_project_wizard/SpiMode"), nSpiMode);
+        GetConfigManager().Write(_T("/sming_project_wizard/SpiClock"), nSpiClock);
+        if(bCustomPath)
+	{
+                GetConfigManager().Write(_T("/sming_project_wizard/EspHome"), sEspHome);
+                GetConfigManager().Write(_T("/sming_project_wizard/SmingHome"), sSmingHome);
+        }
 
     return true;
 }
