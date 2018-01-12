@@ -246,8 +246,6 @@ function SetupProject(project)
 	
 	// Add code completion paths (not working!!!)
 	project.AddToExtensions(_T("code_completion/+search_path:add=$(#SMING)/"));
-	project.Save();
-	project.AddToExtensions(_T("code_completion/+search_path:add=$(#SMING)/"));
 	/* TODO Add following paths to code_completion/+search_path
 	$(#SMING)/ (required for SmingCore/SmingCore.h which provides most Sming includes)
 	$(#SMING/third-party)/rboot (required for rboot-api)
