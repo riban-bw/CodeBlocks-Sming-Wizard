@@ -34,6 +34,9 @@ sUploadBaud <- GetConfigManager().Read(_T("/sming_project_wizard/UploadBaud"), s
 nSpiSize <- GetConfigManager().Read(_T("/sming_project_wizard/SpiSize"), 1);
 nSpiMode <- GetConfigManager().Read(_T("/sming_project_wizard/SpiMode"), 0);
 nSpiClock <- GetConfigManager().Read(_T("/sming_project_wizard/SpiClock"), 2);
+sSpiSize <- _T("512K");
+sSpiMode <- _T("qio");
+sSpiClock <- _T("40");
 
 function BeginWizard()
 {
@@ -66,7 +69,7 @@ function OnEnter_SmingOptions(fwd)
 			Message(_T("There are spaces in the path or filename.\n\n" +
 					   "This is known to break rBoot projects.\n\n" +
 					   "It is advised to correct this before creating the project."), _T("Alert"), wxICON_WARNING);
-			
+
 		}
 	}
 	Wizard.CheckCheckbox(_T("chkSpiffs"), bSpiffs);
@@ -82,10 +85,10 @@ function OnEnter_SmingOptions(fwd)
 	Wizard.SetComboboxSelection(_T("cmbSpiSize"), nSpiSize);
 	Wizard.SetComboboxSelection(_T("cmbSpiMode"), nSpiMode);
 	Wizard.SetComboboxSelection(_T("cmbSpiClock"), nSpiClock);
-	
+
 	OnClick_chkSpiffs()
 	OnClick_chkRboot()
-	
+
     return true;
 }
 
@@ -139,6 +142,9 @@ function OnLeave_SmingOptions(fwd)
 	nSpiSize = Wizard.GetComboboxSelection(_T("cmbSpiSize"));
 	nSpiMode = Wizard.GetComboboxSelection(_T("cmbSpiMode"));
 	nSpiClock = Wizard.GetComboboxSelection(_T("cmbSpiClock"));
+	sSpiSize = Wizard.GetComboboxStringSelection(_T("cmbSpiSize"));
+	sSpiMode = Wizard.GetComboboxStringSelection(_T("cmbSpiMode"));
+	sSpiClock = Wizard.GetComboboxStringSelection(_T("cmbSpiClock"));
 	return true;
 }
 
@@ -177,7 +183,9 @@ function GetGeneratedFile(file_index)
 			filecontent.Replace(_T("COM_PORT ?= /dev/ttyS4"), _T("COM_PORT ?= ") + sComPort );
 			filecontent.Replace(_T("COM_SPEED ?= 115200"), _T("COM_SPEED ?= ") + sBaud );
 			filecontent.Replace(_T("COM_SPEED_ESPTOOL  ?= 115200"), _T("COM_SPEED_ESPTOOL  ?= ") + sUploadBaud );
-			//TODO Populate SPI size and mode
+			filecontent.Replace(_T("SPI_SIZE ?= 4M"), _T("SPI_SIZE ?= ") + sSpiSize);
+			filecontent.Replace(_T("SPI_SPEED ?= 40"), _T("SPI_SPEED ?= ") + sSpiClock);
+			filecontent.Replace(_T("SPI_MODE ?= qio"), _T("SPI_MODE ?= ") + sSpiMode);
 		}
         return filename + _T(";") + filecontent;
     }
@@ -243,7 +251,7 @@ function SetupProject(project)
 	buildTarget.SetMakeCommandFor(mcClean, _T("$make -f $makefile clean"));
     buildTarget = project.AddBuildTarget(_T("spiff_update"));
 	buildTarget.SetMakeCommandFor(mcClean, _T("$make -f $makefile clean"));
-	
+
 	// Add code completion paths (not working!!!)
 	project.AddToExtensions(_T("code_completion/+search_path:add=$(#SMING)/"));
 	/* TODO Add following paths to code_completion/+search_path
