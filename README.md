@@ -11,13 +11,13 @@ Wizard for Code::Blocks to create Sming ESP8266 project
 	
 * Clone the repository to directory 'sming':
 
-    `git clone https://github.com/riban-bw/codeblocks-sming-wizard Sming`
+    `git clone https://github.com/riban-bw/codeblocks-sming-wizard sming`
 
 * Edit Code::Blocks startup script (can be done within Code:Blocks using Settings->Edit startup script menu):
 
 * *	Add:
 	
-	`RegisterWizard(wizProject,     _T("Sming"),        _T("Sming project"),         _T("Embedded Systems"));`
+	`RegisterWizard(wizProject,     _T("sming"),        _T("Sming project"),         _T("Embedded Systems"));`
 
 # Usage
 	

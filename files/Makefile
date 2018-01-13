@@ -1,6 +1,6 @@
 #####################################################
 ### Project configuration                          ##
-### Values may be set using enviromental variables ##
+### Values may be set using environmental variables ##
 #####################################################
 
 ## COM_PORT: Serial port, required to flash firmware

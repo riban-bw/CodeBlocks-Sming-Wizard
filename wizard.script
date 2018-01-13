@@ -56,6 +56,11 @@ function BeginWizard()
         print(wiz_type);
 }
 
+// Returns relative path to project files
+function GetFilesDir()
+{
+	return _T("sming/files");
+}
 
 // Populate Options page with default values
 function OnEnter_SmingOptions(fwd)
@@ -156,7 +161,7 @@ function GetGeneratedFile(file_index)
 	local filename = GetTemplateFile(file_index);
     if (filename != _T(""))
     {
-        local path = Wizard.FindTemplateFile(_T("sming/files/" + filename));
+        local path = Wizard.FindTemplateFile(filename);
 		local filecontent = IO.ReadFileContents(path);
 		if(filename.Matches(_T("Makefile")))
 		{
@@ -213,11 +218,6 @@ function GetTemplateFile(index)
     }
 	else
     if (index == 3)
-    {
-		return _T("include/user_config.h");
-    }
-	else
-    if (index == 4)
     {
 		return _T("spiffs/README.txt");
     }
