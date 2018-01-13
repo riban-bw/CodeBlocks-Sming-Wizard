@@ -11,7 +11,7 @@ Wizard for Code::Blocks to create Sming ESP8266 project
 	
 * Clone the repository to directory 'sming':
 
-    `git clone https://github.com/riban-bw/codeblocks-sming-wizard sming`
+    `git clone https://github.com/riban-bw/codeblocks-sming-wizard Sming`
 
 * Edit Code::Blocks startup script (can be done within Code:Blocks using Settings->Edit startup script menu):
 
@@ -29,15 +29,16 @@ Skeleton project created with:
 
 * src/application.cpp
 * include/application.h
-* include/user_config.h (is this required?)
+* include/user_config.h
 * Makefile
-* Makefile-user.mk (is this required?)
+* spiffs/README.txt
 
 Build targets:
 
 * build (all)
 * flash
 * flashinit
+* spiffs_update
 
 Ensure SMING_HOME and ESP_HOME are set and valid - this may be done by:
 
@@ -59,4 +60,4 @@ For Autocomplete to work for all Sming classes including libraries:
   -	$(#SMING/third-party)/spiffs/src
 * Add Global Variable "SMING" to Code::Blocks, pointing to the Sming base directory, e.g. D:\Sming\Sming (note: This can't use $SMING_HOME on cygwin because path needs to be in Windows format, not POSIX format)
 
-(Autocomplete configuration should be added by the wizard but an issue with Code::Blocks is currently blocking this.)
+(Autocomplete configuration should be added by the wizard but an [issue](https://sourceforge.net/p/codeblocks/tickets/584/) with Code::Blocks is currently blocking this.)
