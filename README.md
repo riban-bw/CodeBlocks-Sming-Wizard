@@ -53,9 +53,9 @@ For Autocomplete to work for all Sming classes including libraries:
 
 * Edit Project Properties.
 * Add to "C/C++ parser options"
-* * $(#SMING)/
-* * $(#SMING/third-party)/rboot
-* *	$(#SMING/third-party)/rboot/appcode
-* *	$(#SMING/third-party)/spiffs/src
+  - $(#SMING)/
+  - $(#SMING/third-party)/rboot
+  -	$(#SMING/third-party)/rboot/appcode
+  -	$(#SMING/third-party)/spiffs/src
 
 (Autocomplete configuration should be added by the wizard but an issue with Code::Blocks is currently blocking this.)
