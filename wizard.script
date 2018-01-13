@@ -56,12 +56,6 @@ function BeginWizard()
         print(wiz_type);
 }
 
-// Returns relative path to project files
-function GetFilesDir()
-{
-	return _T("sming/files");
-}
-
 // Populate Options page with default values
 function OnEnter_SmingOptions(fwd)
 {
@@ -158,10 +152,10 @@ function OnLeave_SmingOptions(fwd)
 // Return an empty string to denote that no more files are to be generated
 function GetGeneratedFile(file_index)
 {
-	local filename = GetTemplateFile(file_index);
+	local filename = GetTemplateFileName(file_index);
     if (filename != _T(""))
     {
-        local path = Wizard.FindTemplateFile(filename);
+        local path = Wizard.FindTemplateFile(_T("sming/files/") + filename);
 		local filecontent = IO.ReadFileContents(path);
 		if(filename.Matches(_T("Makefile")))
 		{
@@ -200,7 +194,7 @@ function GetGeneratedFile(file_index)
 
 // -----------------------------------------------------------------------------
 // Return template filename based on an index
-function GetTemplateFile(index)
+function GetTemplateFileName(index)
 {
     if(index == 0)
 	{
