@@ -45,8 +45,9 @@ Ensure SMING_HOME and ESP_HOME are set and valid - this may be done by:
 * Menu Settings->Environment...
 * Environmental Variables window
 * Create envvar set called "Sming" (optional)
-* Add SMING_HOME = path-to-Sming, e.g. D:\PJ\SmingHub-riban-bw\Sming\Sming
-* Add ESP_HOME = path-to-ESP_HOME, e.g. D:\bin\esp-sdk
+* Add SMING_HOME = path-to-Sming, e.g. /home/riban-bw/Sming/Sming
+* Add ESP_HOME = path-to-ESP_HOME, e.g. /home/riban-bw/esp-sdk
+* Note: Use POSIX style path for cygwin
 
 This may also be set within the operating system.
 
