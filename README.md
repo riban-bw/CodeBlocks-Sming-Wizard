@@ -56,9 +56,6 @@ For Autocomplete to work for all Sming classes including libraries:
 * Edit Project Properties.
 * Add to "C/C++ parser options"
   - $(#SMING)/
-  - $(#SMING/third-party)/rboot
-  -	$(#SMING/third-party)/rboot/appcode
-  -	$(#SMING/third-party)/spiffs/src
 * Add Global Variable "SMING" to Code::Blocks, pointing to the Sming base directory, e.g. D:\Sming\Sming (note: This can't use $SMING_HOME on cygwin because path needs to be in Windows format, not POSIX format)
 
 (Autocomplete configuration should be added by the wizard but an [issue](https://sourceforge.net/p/codeblocks/tickets/584/) with Code::Blocks is currently blocking this.)
