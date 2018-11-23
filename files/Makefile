@@ -16,8 +16,8 @@ COM_SPEED_ESPTOOL ?= 115200
 DISABLE_SPIFFS = 1
 SPIFF_FILES = spiffs
 
-## RBOOT_ENABLED: Set to 1 to use rboot boot loader else do not use boot loader
-RBOOT_ENABLED = 0
+## RBOOT_ENABLED: Set to 1 to use rboot boot loader (non-rboot will be deprecated)
+RBOOT_ENABLED = 1
 
 ## MODULES: Source directories separated by space
 MODULES = src
@@ -34,14 +34,17 @@ ESP_HOME ?= ~/Sming/esp-toolkit/sdk
 ## SMING_HOME Path where Sming framework is located.
 SMING_HOME ?= ~/Sming/Sming
 
-## SPI_SIZE: ESP8266 flash memory size
+## SPI_SIZE: ESP8266 flash memory size [512K | 1M | 2M | 4M]
 SPI_SIZE ?= 4M
 
-## SPI_SPEED: ESP8266 clock speed
+## SPI_SPEED: ESP8266 clock speed [40 | 80]
 SPI_SPEED ?= 40
 
-## SPI_MODE: ESP8266 transfer mode
+## SPI_MODE: ESP8266 transfer mode [qio | qout | dio | dout]
 SPI_MODE ?= qio
+
+## ENABLE_ESPCONN: ESPCONN is used by some network features such as smartconfig when custom LWIP is used
+ENABLE_ESPCONN = 1
 
 ## TERMINAL: Command to launch serial terminal interface with ESP8266
 ifneq ($(filter CYGWIN%,$(shell uname -s)),)
