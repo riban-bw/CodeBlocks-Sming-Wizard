@@ -22,8 +22,8 @@ function BoolToInt(val)
 
 // Wizard global variables
 bSpiffs <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/Spiffs"), 0));
-sSpiffsSize <- GetConfigManager().Read(_T("/sming_project_wizard/SpiffsSize"), _T("128K"));
-bRboot <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/Rboot"), 0));
+sSpiffsSize <- GetConfigManager().Read(_T("/sming_project_wizard/SpiffsSize"), _T("1M"));
+bRboot <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/Rboot"), 1));
 bRbootBigFlash <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/RbootBigFlash"), 1));
 bRbootTwoRoms <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/RbootTwoRoms"), 0));
 bRbootRtc <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/RbootRtc"), 0));
@@ -31,10 +31,10 @@ bRbootGpio <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/RbootG
 sComPort <- GetConfigManager().Read(_T("/sming_project_wizard/ComPort"), _T("/dev/ttyUSB0"));
 sBaud <- GetConfigManager().Read(_T("/sming_project_wizard/Baud"), _T("115200"));
 sUploadBaud <- GetConfigManager().Read(_T("/sming_project_wizard/UploadBaud"), sBaud);
-nSpiSize <- GetConfigManager().Read(_T("/sming_project_wizard/SpiSize"), 1);
+nSpiSize <- GetConfigManager().Read(_T("/sming_project_wizard/SpiSize"), 4);
 nSpiMode <- GetConfigManager().Read(_T("/sming_project_wizard/SpiMode"), 0);
 nSpiClock <- GetConfigManager().Read(_T("/sming_project_wizard/SpiClock"), 2);
-sSpiSize <- _T("512K");
+sSpiSize <- _T("1M");
 sSpiMode <- _T("qio");
 sSpiClock <- _T("40");
 
@@ -109,8 +109,8 @@ function OnClick_chkRboot()
 function OnClick_btnReset()
 {
 	Wizard.CheckCheckbox(_T("chkSpiffs"), false);
-	Wizard.SetTextControlValue(_T("txtSpiffsSize"), _T("128K"));
-	Wizard.CheckCheckbox(_T("chkRboot"), false);
+	Wizard.SetTextControlValue(_T("txtSpiffsSize"), _T("1M"));
+	Wizard.CheckCheckbox(_T("chkRboot"), true);
 	Wizard.CheckCheckbox(_T("chkRbootBigFlash"), true);
 	Wizard.CheckCheckbox(_T("chkRbootTwoRoms"), false);
 	Wizard.CheckCheckbox(_T("chkRbootRtc"), false);
@@ -118,7 +118,7 @@ function OnClick_btnReset()
 	Wizard.SetTextControlValue(_T("txtComPort"), _T("/dev/ttyUSB0"));
 	Wizard.SetTextControlValue(_T("txtBaud"), _T("115200"));
 	Wizard.SetTextControlValue(_T("txtUploadBaud"), _T("115200"));
-	Wizard.SetComboboxSelection(_T("cmbSpiSize"), 1);
+	Wizard.SetComboboxSelection(_T("cmbSpiSize"), 4);
 	Wizard.SetComboboxSelection(_T("cmbSpiMode"), 0);
 	Wizard.SetComboboxSelection(_T("cmbSpiClock"), 2);
 	OnClick_chkRboot();
@@ -248,29 +248,9 @@ function SetupProject(project)
 
 	// Add code completion paths (not working!!!)
 	project.AddToExtensions(_T("code_completion/+search_path:add=$(#SMING)/"));
-	/* TODO Add following paths to code_completion/+search_path
-	$(#SMING)/ (required for SmingCore/SmingCore.h which provides most Sming includes)
-	$(#SMING/third-party)/rboot (required for rboot-api)
-	$(#SMING/third-party)/rboot/appcode (required for rboot-api)
-	$(#SMING/third-party)/spiffs/src (spiffs.h provides constants)
-	$(#SMING)/include (not required)
-	$(#SMING)/system/esp-lwip/lwip/include (does not exist - may need lwip and lwip/app)
-	$(#SMING)/third-party/esp-open-lwip/include (not sure this helps much)
-	$(#SMING)/third-party/lwip2/glue-esp/include-esp
-	$(#SMING)/third-party/lwip2/include
-	$(#SMING)/system/include (Not required? Seems to implement functions pointed to by other available functions, e.g. printf_P)
-	$(#SMING)/Wiring (not required - picked up by SmingCore.h)
-	$(#SMING)/Libraries (not required - picked up by SmingCore.h)
-	$(#SMING)/Libraries/Adafruit_GFX (not required - picked up by SmingCore.h)
-	$(#SMING)/SmingCore (not required - picked up by SmingCore.h)
-	$(#SMING)/Services/SpifFS (don't think we need this)
-	$(SDK_BASE)/../include (doesn't exist)
-	$(#SMING/third-party)/gdbstub (does not exist - there is a gdb directory but this does not parse anyway)
-	$(#SMING/third-party)/axtls-8266 (nothing in this directory - prob not required)
-	$(#SMING/third-party)/axtls-8266/ssl (do we need this?)
-	$(#SMING/third-party)/axtls-8266/crypto (do we need this?)
-
-	*/
+	project.AddToExtensions(_T("code_completion/+search_path:add=$(#SMING)/third-party/rboot"));
+	project.AddToExtensions(_T("code_completion/+search_path:add=$(#SMING)/third-party/rboot/appcode"));
+	project.AddToExtensions(_T("code_completion/+search_path:add=$(#SMING)/spiffs/src"));
 
 	// Persist user selected option values
 	ConfigManager.Write(_T("/sming_project_wizard/Spiffs"), BoolToInt(bSpiffs));

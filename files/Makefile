@@ -43,6 +43,9 @@ SPI_SPEED ?= 40
 ## SPI_MODE: ESP8266 transfer mode [qio | qout | dio | dout]
 SPI_MODE ?= qio
 
+## ENABLE_SSL: Set to 1 to use SSL features
+ENABLE_SSL = 1
+
 ## ENABLE_ESPCONN: ESPCONN is used by some network features such as smartconfig when custom LWIP is used
 ENABLE_ESPCONN = 1
 
