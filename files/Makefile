@@ -19,6 +19,22 @@ SPIFF_FILES = spiffs
 ## RBOOT_ENABLED: Set to 1 to use rboot boot loader (non-rboot will be deprecated)
 RBOOT_ENABLED = 1
 
+## RBOOT_BIG_FLASH: Set to 1 to allow ROM to be located in any 1MB block (not just first 1MB block)
+RBOOT_BIG_FLASH = 1
+
+## RBOOT_TWO_ROMS: Set to 1 to allow two ROMs to be located within first 1MB block
+RBOOT_TWO_ROMS = 0
+
+## RBOOT_RTC_ENABLED: Set to 1 to use RTC memory to communcate with rBoot
+RBOOT_RTC_ENABLED = 0
+
+## RBOOT_GPIO_ENABLED: Set to 1 to use a GPIO pin to select this ROM (do not set RBOOT_GPIO_SKIP_ENABLED)
+## RBOOT_GPIO_SKIP_ENABLED: Set to 1 to use a GPIO pin to select next ROM (do not set RBOOT_GPIO_ENABLED)
+## RBOOT_GPIO_NUMBER: Define GPIO pin to use for rBoot GPIO control
+RBOOT_GPIO_ENABLED = 0
+
+RBOOT_SILENT = 0
+
 ## MODULES: Source directories separated by space
 MODULES = src
 

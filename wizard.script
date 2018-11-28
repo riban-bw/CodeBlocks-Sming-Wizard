@@ -23,11 +23,14 @@ function BoolToInt(val)
 // Wizard global variables
 bSpiffs <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/Spiffs"), 0));
 sSpiffsSize <- GetConfigManager().Read(_T("/sming_project_wizard/SpiffsSize"), _T("1M"));
-bRboot <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/Rboot"), 1));
 bRbootBigFlash <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/RbootBigFlash"), 1));
 bRbootTwoRoms <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/RbootTwoRoms"), 0));
 bRbootRtc <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/RbootRtc"), 0));
-bRbootGpio <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/RbootGpio"), 0));
+nRbootGpioMode <- GetConfigManager().Read(_T("/sming_project_wizard/RbootGpioMode"), 0);
+nRbootGpioPin <- GetConfigManager().Read(_T("/sming_project_wizard/RbootGpioPin"), 10);
+sRbootGpioPin <- _T("16");
+bRbootSilent <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/RbootSilent"), 0));
+bSSL <- IntToBool(GetConfigManager().Read(_T("/sming_project_wizard/SSL"), 1));
 sComPort <- GetConfigManager().Read(_T("/sming_project_wizard/ComPort"), _T("/dev/ttyUSB0"));
 sBaud <- GetConfigManager().Read(_T("/sming_project_wizard/Baud"), _T("115200"));
 sUploadBaud <- GetConfigManager().Read(_T("/sming_project_wizard/UploadBaud"), sBaud);
@@ -73,11 +76,13 @@ function OnEnter_SmingOptions(fwd)
 	}
 	Wizard.CheckCheckbox(_T("chkSpiffs"), bSpiffs);
 	Wizard.SetTextControlValue(_T("txtSpiffsSize"), sSpiffsSize);
-	Wizard.CheckCheckbox(_T("chkRboot"), bRboot);
 	Wizard.CheckCheckbox(_T("chkRbootBigFlash"), bRbootBigFlash);
 	Wizard.CheckCheckbox(_T("chkRbootTwoRoms"), bRbootTwoRoms);
 	Wizard.CheckCheckbox(_T("chkRbootRtc"), bRbootRtc);
-	Wizard.CheckCheckbox(_T("chkRbootGpio"), bRbootGpio);
+	Wizard.SetComboboxSelection(_T("cmbRbootGpioMode"), nRbootGpioMode);
+	Wizard.CheckCheckbox(_T("chkRbootSilent"), bRbootSilent);
+	Wizard.SetComboboxSelection(_T("cmbRbootGpioPin"), nRbootGpioPin);
+	Wizard.CheckCheckbox(_T("chkSSL"), bSSL);
 	Wizard.SetTextControlValue(_T("txtComPort"), sComPort);
 	Wizard.SetTextControlValue(_T("txtBaud"), sBaud);
 	Wizard.SetTextControlValue(_T("txtUploadBaud"), sUploadBaud);
@@ -85,8 +90,8 @@ function OnEnter_SmingOptions(fwd)
 	Wizard.SetComboboxSelection(_T("cmbSpiMode"), nSpiMode);
 	Wizard.SetComboboxSelection(_T("cmbSpiClock"), nSpiClock);
 
-	OnClick_chkSpiffs()
-	OnClick_chkRboot()
+	OnClick_chkSpiffs();
+	OnClick_cmbRbootGpioMode(); //!@todo Change to cmb selection
 
     return true;
 }
@@ -97,32 +102,31 @@ function OnClick_chkSpiffs()
 	Wizard.EnableWindow(_T("txtSpiffsSize"), bSpiffs);
 }
 
-function OnClick_chkRboot()
+function OnClick_cmbRbootGpioMode()
 {
-    bRboot = Wizard.IsCheckboxChecked(_T("chkRboot"));
-	Wizard.EnableWindow(_T("chkRbootBigFlash"), bRboot);
-	Wizard.EnableWindow(_T("chkRbootTwoRoms"), bRboot);
-	Wizard.EnableWindow(_T("chkRbootRtc"), bRboot);
-	Wizard.EnableWindow(_T("chkRbootGpio"), bRboot);
+    nRbootGpioMode = Wizard.GetComboboxSelection(_T("cmbRbootGpioMode"));
+	Wizard.EnableWindow(_T("cmbRbootGpioPin"), (nRbootGpioMode != 0));
 }
 
 function OnClick_btnReset()
 {
 	Wizard.CheckCheckbox(_T("chkSpiffs"), false);
 	Wizard.SetTextControlValue(_T("txtSpiffsSize"), _T("1M"));
-	Wizard.CheckCheckbox(_T("chkRboot"), true);
 	Wizard.CheckCheckbox(_T("chkRbootBigFlash"), true);
 	Wizard.CheckCheckbox(_T("chkRbootTwoRoms"), false);
 	Wizard.CheckCheckbox(_T("chkRbootRtc"), false);
-	Wizard.CheckCheckbox(_T("chkRbootGpio"), false);
+	Wizard.SetComboboxSelection(_T("cmbRbootGpioMode"), 0);
+	Wizard.CheckCheckbox(_T("chkRbootSilent"), false);
+	Wizard.SetComboboxSelection(_T("cmbRbootGpioPin"), 10);
+	Wizard.CheckCheckbox(_T("chkSSL"), true);
 	Wizard.SetTextControlValue(_T("txtComPort"), _T("/dev/ttyUSB0"));
 	Wizard.SetTextControlValue(_T("txtBaud"), _T("115200"));
 	Wizard.SetTextControlValue(_T("txtUploadBaud"), _T("115200"));
 	Wizard.SetComboboxSelection(_T("cmbSpiSize"), 4);
 	Wizard.SetComboboxSelection(_T("cmbSpiMode"), 0);
 	Wizard.SetComboboxSelection(_T("cmbSpiClock"), 2);
-	OnClick_chkRboot();
 	OnClick_chkSpiffs();
+	OnClick_cmbRbootGpioMode();
 }
 
 // Update global variables with options
@@ -130,11 +134,13 @@ function OnLeave_SmingOptions(fwd)
 {
 	bSpiffs = Wizard.IsCheckboxChecked(_T("chkSpiffs"));
 	sSpiffsSize = Wizard.GetTextControlValue(_T("txtSpiffsSize"));
-	bRboot = Wizard.IsCheckboxChecked(_T("chkRboot"));
 	bRbootBigFlash = Wizard.IsCheckboxChecked(_T("chkRbootBigFlash"));
 	bRbootTwoRoms = Wizard.IsCheckboxChecked(_T("chkRbootTwoRoms"));
 	bRbootRtc = Wizard.IsCheckboxChecked(_T("chkRbootRtc"));
-	bRbootGpio = Wizard.IsCheckboxChecked(_T("chkRbootGpio"));
+	nRbootGpioMode = Wizard.GetComboboxSelection(_T("cmbRbootGpioMode"));
+	bRbootSilent = Wizard.IsCheckboxChecked(_T("chkRbootSilent"));
+	sRbootGpioPin = Wizard.GetComboboxStringSelection(_T("cmbRbootGpioPin"));
+	bSSL = Wizard.IsCheckboxChecked(_T("chkSSL"));
 	sComPort = Wizard.GetTextControlValue(_T("txtComPort"));
 	sBaud = Wizard.GetTextControlValue(_T("txtBaud"));
 	sUploadBaud = Wizard.GetTextControlValue(_T("txtUploadBaud"));
@@ -171,20 +177,21 @@ function GetGeneratedFile(file_index)
 				filecontent.Replace(_T("DISABLE_SPIFFS = 1"), _T("DISABLE_SPIFFS = 0\n" +
 					"SPIFF_SIZE = " + lSpiffsSize));
 			}
-			if(bRboot)
-			{
-				filecontent.Replace(_T("RBOOT_ENABLED = 0"), _T("RBOOT_ENABLED = 1\n" +
-					"RBOOT_BIG_FLASH = " + BoolToInt(bRbootBigFlash) +
-					"\nRBOOT_TWO_ROMS = " + BoolToInt(bRbootTwoRoms) +
-					"\nRBOOT_RTC_ENABLED = " + BoolToInt(bRbootRtc) +
-					"\nRBOOT_GPIO_ENABLED = " + BoolToInt(bRbootGpio)));
-			}
+            filecontent.Replace(_T("RBOOT_BIG_FLASH = 1"), _T("RBOOT_BIG_FLASH = " + BoolToInt(bRbootBigFlash)));
+            filecontent.Replace(_T("RBOOT_TWO_ROMS = 0"), _T("RBOOT_TWO_ROMS = " + BoolToInt(bRbootTwoRoms)));
+            filecontent.Replace(_T("RBOOT_RTC_ENABLED = 0"), _T("RBOOT_RTC_ENABLED = " + BoolToInt(bRbootRtc)));
+            if(nRbootGpioMode == 1)
+                    filecontent.Replace(_T("RBOOT_GPIO_ENABLED = 0"), _T("RBOOT_GPIO_ENABLED = 1\nRBOOT_GPIO_NUMBER = " + sRbootGpioPin));
+            if(nRbootGpioMode == 2)
+                    filecontent.Replace(_T("RBOOT_GPIO_ENABLED = 0"), _T("RBOOT_GPIO_SKIP_ENABLED = 1\nRBOOT_GPIO_NUMBER = " + sRbootGpioPin));
+            filecontent.Replace(_T("RBOOT_SILENT = 0"), _T("RBOOT_SILENT = " + BoolToInt(bRbootSilent)));
 			filecontent.Replace(_T("COM_PORT ?= /dev/ttyS4"), _T("COM_PORT ?= ") + sComPort );
 			filecontent.Replace(_T("COM_SPEED ?= 115200"), _T("COM_SPEED ?= ") + sBaud );
 			filecontent.Replace(_T("COM_SPEED_ESPTOOL  ?= 115200"), _T("COM_SPEED_ESPTOOL  ?= ") + sUploadBaud );
 			filecontent.Replace(_T("SPI_SIZE ?= 4M"), _T("SPI_SIZE ?= ") + sSpiSize);
 			filecontent.Replace(_T("SPI_SPEED ?= 40"), _T("SPI_SPEED ?= ") + sSpiClock);
 			filecontent.Replace(_T("SPI_MODE ?= qio"), _T("SPI_MODE ?= ") + sSpiMode);
+			filecontent.Replace(_T("ENABLE_SSL = 1"), _T("ENABLE_SSL = " + BoolToInt(bSSL)));
 		}
         return filename + _T(";") + filecontent;
     }
@@ -253,25 +260,25 @@ function SetupProject(project)
 	project.AddToExtensions(_T("code_completion/+search_path:add=$(#SMING)/spiffs/src"));
 
 	// Persist user selected option values
-	ConfigManager.Write(_T("/sming_project_wizard/Spiffs"), BoolToInt(bSpiffs));
+	GetConfigManager().Write(_T("/sming_project_wizard/Spiffs"), BoolToInt(bSpiffs));
 	if(bSpiffs)
 	{
 		GetConfigManager().Write(_T("/sming_project_wizard/SpiffsSize"), sSpiffsSize);
 	}
-	ConfigManager.Write(_T("/sming_project_wizard/Rboot"), BoolToInt(bRboot));
-	if(bRboot)
-	{
-		GetConfigManager().Write(_T("/sming_project_wizard/RbootBigFlash"), BoolToInt(bRbootBigFlash));
-		GetConfigManager().Write(_T("/sming_project_wizard/RbootTwoRoms"), BoolToInt(bRbootTwoRoms));
-		GetConfigManager().Write(_T("/sming_project_wizard/RbootRtc"), BoolToInt(bRbootRtc));
-		GetConfigManager().Write(_T("/sming_project_wizard/RbootGpio"), BoolToInt(bRbootGpio));
-	}
+    GetConfigManager().Write(_T("/sming_project_wizard/RbootBigFlash"), BoolToInt(bRbootBigFlash));
+    GetConfigManager().Write(_T("/sming_project_wizard/RbootTwoRoms"), BoolToInt(bRbootTwoRoms));
+    GetConfigManager().Write(_T("/sming_project_wizard/RbootRtc"), BoolToInt(bRbootRtc));
+    GetConfigManager().Write(_T("/sming_project_wizard/RbootGpioMode"), nRbootGpioMode);
+    GetConfigManager().Write(_T("/sming_project_wizard/RbootGpioPin"), nRbootGpioPin);
+    GetConfigManager().Write(_T("/sming_project_wizard/RbootSilent"), BoolToInt(bRbootSilent));
+
     GetConfigManager().Write(_T("/sming_project_wizard/ComPort"), sComPort);
     GetConfigManager().Write(_T("/sming_project_wizard/Baud"), sBaud);
     GetConfigManager().Write(_T("/sming_project_wizard/UploadBaud"), sUploadBaud);
     GetConfigManager().Write(_T("/sming_project_wizard/SpiSize"), nSpiSize);
     GetConfigManager().Write(_T("/sming_project_wizard/SpiMode"), nSpiMode);
     GetConfigManager().Write(_T("/sming_project_wizard/SpiClock"), nSpiClock);
+	GetConfigManager().Write(_T("/sming_project_wizard/SSL"), BoolToInt(bSSL));
 
     return true;
 }
